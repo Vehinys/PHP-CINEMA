@@ -80,15 +80,23 @@ Class CinemaController {
     public function addNouveauFilm() {
         $pdo = Connect::seConnecter();
         $titreFilm = filter_input(INPUT_POST, 'titreFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $dureeFilm = filter_input(INPUT_POST, 'dureeFilm', FILTER_VALIDATE_INT);
+
     
         if ($_POST["submit"]) {
             if ($titreFilm) {
                 $requeteAddFilm = $pdo->prepare("
-                    INSERT INTO film (titre)
-                    VALUES (:titre)
+                
+                INSERT INTO film (titre,duree,synopsis,note,urlImage)
+                VALUES (:titre, :duree, :synopsis, :note, :urlImage)
+
                 ");
     
                 $requeteAddFilm->bindParam(':titre', $titreFilm);
+                $requeteAddFilm->bindParam(':duree', $dureeFilm);
+                $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
+                $requeteAddFilm->bindParam(':note', $noteFilm);
+                $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
                 $requeteAddFilm->execute();
                 header("Location: index.php?action=listfilm");
             } 

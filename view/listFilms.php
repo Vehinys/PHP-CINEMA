@@ -1,12 +1,17 @@
 <?php ob_start(); ?>
 
-<!-- Formulaire d'ajout d'un film -->
 <form action="index.php?action=addNouveauFilm" method="post">
     <!-- édition du libellé du film -->
     <label for="nomFilm">Titre du film :</label><br>
     <input required="required" type="text" id="addFilm" name="titreFilm" /><br><br>
+    
+    <!-- ajout de la durée du film -->
+    <label for="dureeFilm">Durée du film</label><br>
+    <input required="required" type="number" id="dureeFilm" name="dureeFilm" /><br><br>
+    
     <input type='submit' name='submit'>
 </form>
+
 
 <div class="container_listFilms">
     <div class="container_section_film">
