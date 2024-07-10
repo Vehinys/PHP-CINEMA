@@ -71,33 +71,39 @@ Class CinemaController {
 
     public function FormulaireFilm() {
         $pdo = Connect::seConnecter();
-        // $requete = $pdo->query("SELECT id_realisateur, nom FROM realisateur");
-        // $realisateurs = $requete->fetchAll();
+        $requete = $pdo->query("SELECT id_realisateur, nom FROM realisateur");
+        $realisateurs = $requete->fetchAll();
     
         require "view/listfilms.php";
     }
     
     public function addNouveauFilm() {
         $pdo = Connect::seConnecter();
+
         $titreFilm = filter_input(INPUT_POST, 'titreFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $dureeFilm = filter_input(INPUT_POST, 'dureeFilm', FILTER_VALIDATE_INT);
+        $synopsisFilm = filter_input(INPUT_POST, 'synopsisFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $noteFilm = filter_input(INPUT_POST, 'noteFilm', FILTER_VALIDATE_INT);
+        $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $idRealisateur = filter_input(INPUT_POST, 'idRealisateur', FILTER_VALIDATE_INT);
 
     
         if ($_POST["submit"]) {
             if ($titreFilm) {
                 $requeteAddFilm = $pdo->prepare("
                 
-                INSERT INTO film (titre,duree,synopsis,note,urlImage)
-                VALUES (:titre, :duree, :synopsis, :note, :urlImage)
+                INSERT INTO film (titre, duree, synopsis, note, urlImage, id_realisateur)
+                VALUES (:titre, :duree, :synopsis, :note, :urlImage, :id_realisateur)
 
                 ");
     
-                $requeteAddFilm->bindParam(':titre', $titreFilm);
-                $requeteAddFilm->bindParam(':duree', $dureeFilm);
+                $requeteAddFilm->bindParam(':titre',    $titreFilm);
+                $requeteAddFilm->bindParam(':duree',    $dureeFilm);
                 $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
-                $requeteAddFilm->bindParam(':note', $noteFilm);
+                $requeteAddFilm->bindParam(':note',     $noteFilm);
                 $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
                 $requeteAddFilm->execute();
+
                 header("Location: index.php?action=listfilm");
             } 
         }
