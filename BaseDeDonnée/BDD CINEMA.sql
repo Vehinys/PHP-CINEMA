@@ -49,16 +49,16 @@ CREATE TABLE IF NOT EXISTS `casting` (
 CREATE TABLE IF NOT EXISTS `film` (
   `id_film` int NOT NULL AUTO_INCREMENT,
   `titre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `dateDeSortieEnFrance` date NOT NULL,
-  `duree` int NOT NULL,
+  `dateDeSortieEnFrance` date DEFAULT NULL,
+  `duree` int NOT NULL DEFAULT '0',
   `synopsis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `note` int NOT NULL,
+  `note` int NOT NULL DEFAULT '0',
   `urlImage` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `id_realisateur` int NOT NULL DEFAULT '0',
+  `id_realisateur` int DEFAULT NULL,
   PRIMARY KEY (`id_film`),
   KEY `FK__realisateur` (`id_realisateur`),
   CONSTRAINT `FK__realisateur` FOREIGN KEY (`id_realisateur`) REFERENCES `realisateur` (`id_realisateur`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Les données exportées n'étaient pas sélectionnées.
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `genre` (
   `id_genre` int NOT NULL AUTO_INCREMENT,
   `libelle` varchar(50) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_genre`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Les données exportées n'étaient pas sélectionnées.
 
