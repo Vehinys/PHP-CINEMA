@@ -17,8 +17,10 @@ if (isset($_GET["action"])) {
         case "listActeurs"        : $ctrlCinema->listActeurs(); break;
         case "listRealisateurs"   : $ctrlCinema->listRealisateurs(); break;
         case "listGenres"         : $ctrlCinema->listGenres(); break;
+        
         case "FormulaireGenre"    : $ctrlCinema->FormulaireGenre(); break;
         case "addNouveauGenre"    : $ctrlCinema->addNouveauGenre(); break;
+        
         default                   : $ctrlCinema->Home();
     }
 }
