@@ -1,0 +1,250 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+/* ============================ IMAGE BACKGROUND ============================ */
+
+body {
+    background-image: url("../img/background-869596_1280.webp");
+    background-size: cover;
+}
+
+/* ============================ WIDTH HEADER ============================ */
+
+header {
+    width: 100%;
+}
+
+.container_navbar {
+    width: 60%;
+    margin: 2.5rem 0;
+}
+
+.container_titre ,.container_sociaux {
+    width: 20%;
+    margin: 2.5rem 0;
+    align-content: center;
+}
+
+#container_nav {
+    display: flex;
+    border-bottom: 5px solid #ffffff;
+    
+}
+
+/* ============================ LOGO ============================ */
+
+.container_titre h1 {
+    display: flex;
+    font-size: 2.5rem;
+    color:white ;
+    gap: 3%;
+    justify-content:center;
+}
+.color_logo {
+    color :red;
+}
+
+/* ============================ NAVBAR ============================ */
+
+.container_navbar ul {
+    display: flex;
+    list-style-type : none;
+    justify-content: space-evenly;
+}
+.container_navbar ul li a {
+    text-decoration: none;
+    font-size: 2.5rem;
+    color:white ;
+}
+
+.container_navbar ul li a:hover {
+    color:rgb(255, 0, 0) ;
+}
+
+/* ============================ ICONE ============================ */
+
+.container_sociaux a {
+    font-size: 2.5rem;
+    color:white ;
+    text-align: center;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.container_sociaux a:hover {
+
+    color:rgb(255, 0, 0) ;
+}
+
+/* ============================ MAIN ============================ */
+
+main{
+    text-align: -webkit-center;
+}
+/* ============================ PUB ============================ */
+
+.container_img {
+    text-align: center;
+    margin: 3rem 0;
+}
+
+/* ============================ CONTENU ============================ */
+
+.flex_text {
+    display: flex;
+    width: 40%;
+    align-items: center;
+    color: white;
+    font-size: 50px;
+    margin: 1rem 0 1rem 0;
+  
+}
+
+#rectangle_red {
+    width: 0.25rem; 
+    height: 2.5rem; 
+    background: red;
+    margin: 0 0.25rem 0 1rem;
+}
+
+/* ============================ home ============================ */
+
+.container_home {
+    width: 80%;
+    color: white;
+    text-align: center;
+}
+
+.container_home img {
+    width: 200px;
+    height: 300px;
+    align-self: center;
+}
+.container_section{
+    display: inline-flex;
+    align-items: baseline;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.container_section_requete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container_section_requete a {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+}
+
+.container_section_requete td { 
+    margin-top: 20px;
+    font-size: 22px;
+
+}
+
+.container_section_requete a:hover { 
+    color:rgb(255, 0, 0) ;
+    }
+
+/* ============================ film ============================ */
+
+
+.films_text_titre a {
+    color: white;
+    text-decoration: none;
+    font-size: 33px;
+}
+
+.films_text_titre a:hover {
+    color: rgb(251, 0, 0);
+
+}
+
+.flex_text_film {
+    width: 80%;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 50px;
+    margin: 1rem 0 1rem 0;
+}
+
+.films_text_titre {
+    text-align: center;
+    margin: 5px 0 15px 0;
+}
+
+td .films_text_titre {
+    width: 100px;
+}
+
+.container_section_film {
+    display: flex;
+    flex-direction: column;
+}
+
+.container_section_film tr {
+    display: flex;
+    flex-direction: column;
+    writing-mode: tb-rl
+}
+
+.listFilm_img_url {
+    width: 300px;
+    height: 500px;
+    align-self: center;
+    margin: 0 0 10px 0;
+}
+
+.container_section_film table {
+    width: 50%
+}
+.container_card {
+    text-align: center;
+}
+
+
+/* ============================ acteur ============================ */
+
+.container_acteurs {
+    color: white;
+}
+
+/* ============================ realisateur ============================ */
+
+.container_realisateurs {
+    color: white;
+}
+
+/* ============================ genre ============================ */
+
+.container_genres {
+    color: white;
+}
+
+/* ============================ detailFilm ============================ */
+
+.img_url {
+    width: 600px;
+}
+
+/* ============================ FOOTER ============================ */
+
+footer {
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    padding: 2rem 0 2rem 0;
+    margin-top: 2rem;
+    border-top: 5px solid #ffffff;
+}
+
+small {
+
+    text-align: center;
+}
