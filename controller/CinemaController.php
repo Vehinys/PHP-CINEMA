@@ -102,4 +102,23 @@ WHERE
 
     }
 
+
+    public function FormulaireGenre() {
+        require "view/listGenres.php";
+    }
+
+    public function addNouveauGenre() {
+        $pdo = Connect::seConnecter();
+        $addGenre = filter_input(INPUT_POST, 'addGenre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+        if ($_POST["submit"]) {
+            $requeteAjoutGenre = $pdo->prepare("
+                INSERT INTO genre (libelle)
+                VALUES (:addGenre)
+            ");
+            $requeteAjoutGenre->bindParam(':addGenre', $addGenre);
+            $requeteAjoutGenre->execute();
+        }
+    }
+
 }
