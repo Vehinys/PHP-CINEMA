@@ -67,15 +67,6 @@ Class CinemaController {
     }
 
     /* ----------------- LISTE FILM - ADD FILM ----------------- */
-
-
-    public function FormulaireFilm() {
-        $pdo = Connect::seConnecter();
-        $requete = $pdo->query("SELECT id_realisateur, nom FROM realisateur");
-        $realisateurs = $requete->fetchAll();
-        
-        require "view/formulaireFilm.php";
-    }
     
     public function addNouveauFilm() {
         $pdo = Connect::seConnecter();
@@ -96,6 +87,9 @@ Class CinemaController {
                 VALUES (:titre, :duree, :synopsis, :note, :urlImage, :id_realisateur)
 
                 ");
+
+                $requete = $pdo->query("SELECT id_realisateur, nom FROM realisateur");
+                $realisateurs = $requete->fetchAll();
     
                 $requeteAddFilm->bindParam(':titre',    $titreFilm);
                 $requeteAddFilm->bindParam(':duree',    $dureeFilm);
@@ -108,6 +102,7 @@ Class CinemaController {
                 header("Location: index.php?action=listfilm");
             } 
         }
+        require "view/listActeurs.php";
     }
     
 

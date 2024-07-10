@@ -1,25 +1,18 @@
 <?php ob_start(); ?>
 
 <form action="index.php?action=addNouveauFilm" method="post">
+    
     <!-- édition du libellé du film -->
+
     <label for="nomFilm">Titre du film :</label><br>
     <input required="required" type="text" id="titreFilm" name="titreFilm" /><br><br>
     
     <!-- ajout de la durée du film -->
+
     <label for="dureeFilm">Durée du film</label><br>
     <input required="required" type="number" id="dureeFilm" name="dureeFilm" /><br><br>
 
-    <!-- ajout du synopsis du film -->
-    <label for="synopsisFilm">Synopsis du film :</label><br>
-    <textarea required="required" id="synopsisFilm" name="synopsisFilm"></textarea><br><br>
-
-    <!-- ajout de la note du film -->
-    <label for="noteFilm">Note du film (sur 5) :</label><br>
-    <input required="required" type="number" id="noteFilm" name="noteFilm" min="0" max="5" /><br><br>
-    
-    <!-- ajout de l'url du film -->
-    <label for="urlFilm">url du film</label><br>
-    <input required="required" type="url" id="urlFilm" name="urlImageFilm" /><br><br>
+    <!-- ajout de le realisateur du film -->
 
     <label for="idRealisateur">Réalisateur :</label><br>
     <select required="required" id="idRealisateur" name="id_realisateurFilm">
@@ -29,12 +22,24 @@
     </select>
     <br><br>
 
+    <!-- ajout de l'url du film -->
+
+    <label for="urlFilm">url du film</label><br>
+    <input required="required" type="url" id="urlFilm" name="urlImageFilm" /><br><br>
+
+    <!-- ajout du synopsis du film -->
+
+    <label for="synopsisFilm">Synopsis du film :</label><br>
+    <textarea required="required" id="synopsisFilm" name="synopsisFilm"></textarea><br><br>
+
+    <!-- ajout de la note du film -->
+
+    <label for="noteFilm">Note du film (sur 5) :</label><br>
+    <input required="required" type="number" id="noteFilm" name="noteFilm" min="0" max="5" /><br><br>
+
     <input type='submit' name='submit'>
 
 </form>
-
-<?php var_dump($realisateurs);?>
-
 
 <div class="container_listFilms">
     <div class="container_section_film">
