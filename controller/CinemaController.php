@@ -73,8 +73,8 @@ Class CinemaController {
         $pdo = Connect::seConnecter();
         $requete = $pdo->query("SELECT id_realisateur, nom FROM realisateur");
         $realisateurs = $requete->fetchAll();
-    
-        require "view/listfilms.php";
+        
+        require "view/formulaireFilm.php";
     }
     
     public function addNouveauFilm() {
@@ -85,7 +85,7 @@ Class CinemaController {
         $synopsisFilm = filter_input(INPUT_POST, 'synopsisFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $noteFilm = filter_input(INPUT_POST, 'noteFilm', FILTER_VALIDATE_INT);
         $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $idRealisateur = filter_input(INPUT_POST, 'idRealisateur', FILTER_VALIDATE_INT);
+        $id_realisateurFilm = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
 
     
         if ($_POST["submit"]) {
@@ -102,6 +102,7 @@ Class CinemaController {
                 $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
                 $requeteAddFilm->bindParam(':note',     $noteFilm);
                 $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
+                $requeteAddFilm->bindParam(':id_realisateur', $id_realisateurFilm);
                 $requeteAddFilm->execute();
 
                 header("Location: index.php?action=listfilm");

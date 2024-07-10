@@ -22,15 +22,18 @@
     <input required="required" type="url" id="urlFilm" name="urlImageFilm" /><br><br>
 
     <label for="idRealisateur">Réalisateur :</label><br>
-    <select required="required" id="idRealisateur" name="idRealisateur">
+    <select required="required" id="idRealisateur" name="id_realisateurFilm">
         <?php foreach ($realisateurs as $realisateur): ?>
-            <option value="<?= $realisateur['id_realisateur']; ?>"><?= htmlspecialchars($realisateur['nom']); ?></option>
+            <option value="<?= $realisateur['id_realisateur']; ?>"> <?= htmlspecialchars($realisateur['nom']); ?> </option>
         <?php endforeach; ?>
-    </select><br><br>
+    </select>
+    <br><br>
 
     <input type='submit' name='submit'>
 
 </form>
+
+<?php var_dump($realisateurs);?>
 
 
 <div class="container_listFilms">
