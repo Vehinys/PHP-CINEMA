@@ -20,6 +20,9 @@ if (isset($_GET["action"])) {
         
         case "FormulaireGenre"    : $ctrlCinema->FormulaireGenre(); break;
         case "addNouveauGenre"    : $ctrlCinema->addNouveauGenre(); break;
+
+        case "FormulaireFilm"     : $ctrlCinema->FormulaireFilm(); break;
+        case "addNouveauFilm"     : $ctrlCinema->addNouveauFilm(); break;
         
         default                   : $ctrlCinema->Home();
     }

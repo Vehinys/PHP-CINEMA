@@ -1,7 +1,5 @@
 <?php ob_start(); ?>
 
-<!-- Affiche le nb total de Genres enregistrés en BDD (table genre) -->
-
 <!-- Formulaire d'ajout d'un genre -->
 <form action="index.php?action=addNouveauGenre" method="post">
     <!-- édition du libellé du genre -->
