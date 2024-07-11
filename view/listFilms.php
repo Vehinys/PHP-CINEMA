@@ -10,6 +10,13 @@
             <input required="required" type="text" id="titreFilm" name="titreFilm" />
         </div>
 
+        <!-- Année du film -->
+
+        <div class="form-group">
+            <label for="dateDeSortieEnFranceFilm">Année du film :</label>
+            <input required="required" type="date" id="dateDeSortieEnFranceFilm" name="dateDeSortieEnFranceFilm" />
+        </div>
+
         <!-- Durée du film -->
 
         <div class="form-group">
@@ -23,14 +30,10 @@
 
         <label for="realisateur"> Réalisateur :</label>
         <select id="realisateur" name="id_realisateurFilm">
-            <?php 
-            
-            foreach ($requeteReal -> fetchAll() as $realisateur): ?>
-
+            <?php foreach ($requeteReal -> fetchAll() as $realisateur): ?>
                 <option value="<?php echo $realisateur['id_realisateur']; ?>"> 
-                <?php echo $realisateur['realisateur']; ?>
-                </option>
-            <?php endforeach; ?>
+                    <?php echo $realisateur['realisateur']; ?> </option>
+                    <?php endforeach; ?>
         </select>
         </div>
 
@@ -56,6 +59,7 @@
         </div>
 
         <!-- Bouton submit -->
+
         <button type="submit" class="btn btn-primary">Ajouter</button>
 
     </form>
