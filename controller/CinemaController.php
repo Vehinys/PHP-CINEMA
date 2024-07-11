@@ -45,6 +45,16 @@ Class CinemaController {
         ORDER BY titre ASC;
         ");
 
+        /* ----------------- REQUETE AFFICHAGE MENU DEROULANT ----------------- */
+
+        $requeteReal = $pdo->query("
+
+        SELECT CONCAT(p.nom,' ', p.prenom) as realisateur ,id_realisateur
+        FROM realisateur r
+        INNER JOIN personne p ON p.id_personne = r.id_personne
+
+    ");
+
         require "view/listFilms.php";
     }
 
@@ -78,17 +88,18 @@ Class CinemaController {
             $synopsisFilm = filter_input(INPUT_POST, 'synopsisFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $noteFilm = filter_input(INPUT_POST, 'noteFilm', FILTER_VALIDATE_INT);
             $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_URL);
-    
+            $id_realisateurFilm = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
+
             // Vérification des données filtrées et validées
 
-            if ($titreFilm && $dureeFilm !== false && $synopsisFilm && $noteFilm !== false && $urlImageFilm) {
+            if ($titreFilm && $dureeFilm !== false && $synopsisFilm && $noteFilm !== false && $urlImageFilm && $id_realisateurFilm !== false) {
 
                 $pdo = Connect::seConnecter();
 
                 $requeteAddFilm = $pdo->prepare("
 
-                    INSERT INTO film (titre, duree, synopsis, note, urlImage)
-                    VALUES (:titre, :duree, :synopsis, :note, :urlImage)
+                    INSERT INTO film (titre, duree, synopsis, note, urlImage, id_realisateur)
+                    VALUES (:titre, :duree, :synopsis, :note, :urlImage, :id_realisateur)
                 ");
     
                 // Liaison des paramètres et exécution de la requête d'insertion
@@ -98,11 +109,12 @@ Class CinemaController {
                 $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
                 $requeteAddFilm->bindParam(':note', $noteFilm);
                 $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
+                $requeteAddFilm->bindParam(':id_realisateur', $id_realisateurFilm);
                 $requeteAddFilm->execute();
     
                 // Redirection vers la page listfilm après l'insertion réussie
 
-                header("Location: index.php?action=listfilm");
+                header("Location: index.php?action=listFilms");
 
                 exit; // Arrête l'exécution du script après la redirection
 
@@ -116,9 +128,9 @@ Class CinemaController {
     
         // Inclusion du fichier de vue pour afficher le formulaire
 
-        require "view/listActeurs.php";
+        require "view/listFilms.php";
     }
-    
+
     /* ----------------- LISTE ACTEUR ----------------- */
 
     public function listActeurs() {
