@@ -1,79 +1,42 @@
 <?php ob_start(); ?>
 
 <div class="container_form">
-
     <form action="index.php?action=addNouveauFilm" method="post">
-        
-        <!-- édition du libellé du film -->
 
-        <div>
-            <label for="nomFilm">Titre du film :</label><br>
-
-            <input required="required" type="text" id="titreFilm" class="styleFormFilm" name="titreFilm" /><br><br>
+        <!-- Titre du film -->
+        <div class="form-group">
+            <label for="titreFilm">Titre du film :</label>
+            <input required="required" type="text" id="titreFilm" name="titreFilm" />
         </div>
 
-        <!-- ajout de la durée du film -->
-
-        <div>
-            <label for="dureeFilm">Durée du film</label><br>
-
-            <input required="required" type="number" id="dureeFilm" class="styleFormFilm" name="dureeFilm" /><br><br>
-            
+        <!-- Durée du film -->
+        <div class="form-group">
+            <label for="dureeFilm">Durée du film (en minutes) :</label>
+            <input required="required" type="number" id="dureeFilm" name="dureeFilm" />
         </div>
 
-        <!-- ajout de le realisateur du film -->
-
-        <div>
-            <label for="idRealisateur">Réalisateur :</label><br>
-
-            <select required="required" id="idRealisateur" class="styleFormFilm" name="id_realisateurFilm">
-
-                <?php foreach ($realisateurs as $realisateur): ?>
-
-                    <option value="<?= $realisateur['id_realisateur']; ?>"> <?= htmlspecialchars($realisateur['nom']); ?> </option>
-
-                <?php endforeach; ?>
-
-            </select> <br><br>
-
+        <!-- URL de l'image du film -->
+        <div class="form-group">
+            <label for="urlImageFilm">URL de l'image du film :</label>
+            <input required="required" type="url" id="urlImageFilm" name="urlImageFilm" />
         </div>
 
-        <!-- ajout de l'url du film -->
-
-        <div>
-
-            <label for="urlFilm">url du film</label><br>
-
-            <input required="required" type="url" id="urlFilm" class="styleFormFilm" name="urlImageFilm" /><br><br>
-
+        <!-- Synopsis du film -->
+        <div class="form-group">
+            <label for="synopsisFilm">Synopsis du film :</label>
+            <textarea required="required" id="synopsisFilm" name="synopsisFilm"></textarea>
         </div>
 
-        <!-- ajout du synopsis du film -->
-
-        <div>
-
-            <label for="synopsisFilm">Synopsis du film :</label><br>
-
-            <textarea required="required" id="synopsisFilm" class="styleFormFilm" name="synopsisFilm"></textarea><br><br>
-
+        <!-- Note du film -->
+        <div class="form-group">
+            <label for="noteFilm">Note du film (sur 5) :</label>
+            <input required="required" type="number" id="noteFilm" name="noteFilm" min="0" max="5" />
         </div>
 
-        <!-- ajout de la note du film -->
-
-        <div>
-
-            <label for="noteFilm">Note du film (sur 5) :</label><br>
-
-            <input required="required" type="number" id="noteFilm" class="styleFormFilm" name="noteFilm" min="0" max="5" /><br><br>
-
-        </div>
-
-        <!-- bouton submit -->
-
-        <input type='submit' name='submit'>
+        <!-- Bouton submit -->
+        <button type="submit" class="btn btn-primary">Ajouter</button>
 
     </form>
-
 </div>
 
 <div class="container_listFilms">

@@ -51,6 +51,7 @@ Class CinemaController {
     /* ----------------- LISTE FILM - DETAILS FILM ----------------- */
         
     public function detailFilm($id) {
+
         $pdo = Connect::seConnecter();
         $requete = $pdo->prepare("
     
@@ -69,42 +70,55 @@ Class CinemaController {
     /* ----------------- LISTE FILM - ADD FILM ----------------- */
     
     public function addNouveauFilm() {
-        $pdo = Connect::seConnecter();
 
-        $titreFilm = filter_input(INPUT_POST, 'titreFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $dureeFilm = filter_input(INPUT_POST, 'dureeFilm', FILTER_VALIDATE_INT);
-        $synopsisFilm = filter_input(INPUT_POST, 'synopsisFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $noteFilm = filter_input(INPUT_POST, 'noteFilm', FILTER_VALIDATE_INT);
-        $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $id_realisateurFilm = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+            $titreFilm = filter_input(INPUT_POST, 'titreFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $dureeFilm = filter_input(INPUT_POST, 'dureeFilm', FILTER_VALIDATE_INT);
+            $synopsisFilm = filter_input(INPUT_POST, 'synopsisFilm', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $noteFilm = filter_input(INPUT_POST, 'noteFilm', FILTER_VALIDATE_INT);
+            $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_URL);
     
-        if ($_POST["submit"]) {
-            if ($titreFilm) {
+            // Vérification des données filtrées et validées
+
+            if ($titreFilm && $dureeFilm !== false && $synopsisFilm && $noteFilm !== false && $urlImageFilm) {
+
+                $pdo = Connect::seConnecter();
+
                 $requeteAddFilm = $pdo->prepare("
-                
-                INSERT INTO film (titre, duree, synopsis, note, urlImage, id_realisateur)
-                VALUES (:titre, :duree, :synopsis, :note, :urlImage, :id_realisateur)
 
+                    INSERT INTO film (titre, duree, synopsis, note, urlImage)
+                    VALUES (:titre, :duree, :synopsis, :note, :urlImage)
                 ");
-
-                $requete = $pdo->query("SELECT id_realisateur, nom FROM realisateur");
-                $realisateurs = $requete->fetchAll();
     
-                $requeteAddFilm->bindParam(':titre',    $titreFilm);
-                $requeteAddFilm->bindParam(':duree',    $dureeFilm);
+                // Liaison des paramètres et exécution de la requête d'insertion
+
+                $requeteAddFilm->bindParam(':titre', $titreFilm);
+                $requeteAddFilm->bindParam(':duree', $dureeFilm);
                 $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
-                $requeteAddFilm->bindParam(':note',     $noteFilm);
+                $requeteAddFilm->bindParam(':note', $noteFilm);
                 $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
-                $requeteAddFilm->bindParam(':id_realisateur', $id_realisateurFilm);
                 $requeteAddFilm->execute();
+    
+                // Redirection vers la page listfilm après l'insertion réussie
 
                 header("Location: index.php?action=listfilm");
-            } 
+
+                exit; // Arrête l'exécution du script après la redirection
+
+            } else {
+
+                // Gestion des erreurs si les données ne sont pas valides
+
+                echo "Erreur : Veuillez vérifier les données saisies.";
+            }
         }
+    
+        // Inclusion du fichier de vue pour afficher le formulaire
+
         require "view/listActeurs.php";
     }
-
+    
     /* ----------------- LISTE ACTEUR ----------------- */
 
     public function listActeurs() {
