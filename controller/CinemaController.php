@@ -104,8 +104,6 @@ Class CinemaController {
         }
         require "view/listActeurs.php";
     }
-    
-
 
     /* ----------------- LISTE ACTEUR ----------------- */
 
