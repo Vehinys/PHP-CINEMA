@@ -13,8 +13,8 @@
         <!-- Année du film -->
 
         <div class="form-group">
-            <label for="dateDeSortieEnFranceFilm">Année du film :</label>
-            <input required="required" type="date" id="dateDeSortieEnFranceFilm" name="dateDeSortieEnFranceFilm" />
+            <label for="dateSortieFilm">Année du film :</label>
+            <input required="required" type="date" id="dateSortieFilm" name="dateDeSortieEnFrance" min="1800-01-01" max="<?= date('Y-m-d');?>" />
         </div>
 
         <!-- Durée du film -->

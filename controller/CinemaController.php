@@ -89,11 +89,14 @@ Class CinemaController {
             $noteFilm = filter_input(INPUT_POST, 'noteFilm', FILTER_VALIDATE_INT);
             $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_URL);
             $id_realisateurFilm = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
-            $dateSortie = filter_input(INPUT_POST, 'dateDeSortieEnFrance');
+            $dateSortieFilm = filter_input(INPUT_POST, 'dateDeSortieEnFrance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+
+            var_dump($dateSortieFilm);
 
             // Vérification des données filtrées et validées
 
-            if ($titreFilm && $dureeFilm !== false && $synopsisFilm && $noteFilm !== false && $urlImageFilm && $id_realisateurFilm !== false && $dateSortie)  {
+            if ($titreFilm && $dureeFilm !== false && $synopsisFilm && $noteFilm !== false && $urlImageFilm && $id_realisateurFilm !== false && $dateSortieFilm)  {
 
                 $pdo = Connect::seConnecter();
 
@@ -111,7 +114,7 @@ Class CinemaController {
                 $requeteAddFilm->bindParam(':note', $noteFilm);
                 $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
                 $requeteAddFilm->bindParam(':id_realisateur', $id_realisateurFilm);
-                $requeteAddFilm->bindParam(':dateDeSortieEnFrance', $dateSortie);
+                $requeteAddFilm->bindParam(':dateDeSortieEnFrance', $dateSortieFilm);
                 $requeteAddFilm->execute();
     
                 // Redirection vers la page listfilm après l'insertion réussie
