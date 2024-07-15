@@ -181,10 +181,10 @@ Class CinemaController {
     public function listActeurs() {
         $pdo = Connect::seConnecter();
         $requete = $pdo->query("
-            SELECT a.id_acteur, p.prenom, p.nom, p.dateNaissance
+            SELECT a.id_acteur, p.prenom, p.nom
             FROM acteur a
             INNER JOIN personne p ON a.id_personne = p.id_personne
-            ORDER BY p.nom
+            ORDER BY p.nom ASC
         ");
     
         require "view/listActeurs.php";
@@ -232,33 +232,30 @@ Class CinemaController {
     /* --- LISTE FILM - ADD ACTEUR --- */
 
     public function addNouveauActeur() {
-
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-            $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $sexe = filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $dateDeNaissance = filter_input(INPUT_POST, 'dateDeNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $id_acteur = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
-
+            $nom           = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $prenom        = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $sexe          = filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $dateNaissance = filter_input(INPUT_POST, 'dateNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $id_personne   = filter_input(INPUT_POST, 'id_personne', FILTER_VALIDATE_INT);
     
             // Vérification des données filtrées et validées
 
             
-            if ($nom && $prenom !== false && $sexe && $dateDeNaissance !== false && $id_acteur !== false) {
+            if ($nom && $prenom && $sexe && $dateNaissance && $id_personne !== false) {
                 $pdo = Connect::seConnecter();
     
                 $requeteAddActeur = $pdo->prepare("
-                    INSERT INTO acteur (nom, prenom, sexe, dateDeNaissance, id_acteur)
-                    VALUES (:nom, :prenomn, :sexe, :dateDeNaissance, :id_acteur)
+                    INSERT INTO personne (nom, prenom, sexe, dateNaissance, id_personne)
+                    VALUES (:nom, :prenom, :sexe, :dateNaissance, :id_personne)
                 ");
     
                 // Liaison des paramètres et exécution de la requête d'insertion
                 $requeteAddActeur->bindParam(':nom', $nom);
                 $requeteAddActeur->bindParam(':prenom', $prenom);
                 $requeteAddActeur->bindParam(':sexe', $sexe);
-                $requeteAddActeur->bindParam(':dateDeNaissance', $dateDeNaissance);
-                $requeteAddActeur->bindParam(':id_acteur', $id_acteur);
+                $requeteAddActeur->bindParam(':dateNaissance', $dateNaissance);
+                $requeteAddActeur->bindParam(':id_personne', $id_personne);
                 $requeteAddActeur->execute();
     
                 // Redirection vers la page listActeurs après l'insertion réussie
