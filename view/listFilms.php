@@ -1,70 +1,5 @@
 <?php ob_start(); ?>
 
-<div class="container_form">
-    <form action="index.php?action=addNouveauFilm" method="post">
-
-        <!-- Titre du film -->
-
-        <div class="form-group">
-            <label for="titreFilm">Titre du film :</label>
-            <input required="required" type="text" id="titreFilm" name="titreFilm" />
-        </div>
-
-        <!-- Année du film -->
-
-        <div class="form-group">
-            <label for="dateSortieFilm">Année du film :</label>
-            <input required="required" type="date" id="dateSortieFilm" name="dateDeSortieEnFrance" min="1800-01-01" max="<?= date('Y-m-d');?>" />
-        </div>
-
-        <!-- Durée du film -->
-
-        <div class="form-group">
-            <label for="dureeFilm">Durée du film (en minutes) :</label>
-            <input required="required" type="number" id="dureeFilm" name="dureeFilm" />
-        </div>
-
-        <!-- Réalisateur du film -->
-
-        <div>
-
-        <label for="realisateur"> Réalisateur :</label>
-        <select id="realisateur" name="id_realisateurFilm">
-            <?php foreach ($requeteReal -> fetchAll() as $realisateur): ?>
-                <option value="<?php echo $realisateur['id_realisateur']; ?>"> 
-                    <?php echo $realisateur['realisateur']; ?> </option>
-                    <?php endforeach; ?>
-        </select>
-        </div>
-
-        <!-- URL de l'image du film -->
-
-        <div class="form-group">
-            <label for="urlImageFilm">URL de l'image du film :</label>
-            <input required="required" type="url" id="urlImageFilm" name="urlImageFilm" />
-        </div>
-
-        <!-- Synopsis du film -->
-
-        <div class="form-group">
-            <label for="synopsisFilm">Synopsis du film :</label>
-            <textarea required="required" id="synopsisFilm" name="synopsisFilm"></textarea>
-        </div>
-
-        <!-- Note du film -->
-
-        <div class="form-group">
-            <label for="noteFilm">Note du film (sur 5) :</label>
-            <input required="required" type="number" id="noteFilm" name="noteFilm" min="0" max="5" />
-        </div>
-
-        <!-- Bouton submit -->
-
-        <button type="submit" class="btn btn-primary">Ajouter</button>
-
-    </form>
-</div>
-
 <div class="container_listFilms">
 
     <div class="container_section_film">
@@ -113,6 +48,72 @@
 
     </div>
 
+</div>
+
+<div class="container_form">
+    <form action="index.php?action=addNouveauFilm" method="post">
+
+        <!-- Titre du film -->
+
+        <div class="form-group">
+            <label for="titreFilm">Titre du film :</label>
+            <input required="required" type="text" id="titreFilm" name="titreFilm" />
+        </div>
+
+        <!-- Année du film -->
+
+        <div class="form-group">
+            <label for="dateSortieFilm">Année du film :</label>
+            <input required="required" type="date" id="dateSortieFilm" name="dateDeSortieEnFrance" min="1800-01-01" max="<?= date('Y-m-d');?>" />
+        </div>
+
+        <!-- Durée du film -->
+
+        <div class="form-group">
+            <label for="dureeFilm">Durée du film (en minutes) :</label>
+            <input required="required" type="number" id="dureeFilm" name="dureeFilm" />
+        </div>
+
+        <!-- Réalisateur du film -->
+
+        <div>
+
+        <label for="realisateur"> Réalisateur :</label>
+        <select id="realisateur" name="id_realisateurFilm">
+            <?php foreach ($requeteReal -> fetchAll() as $realisateur): ?>
+                <option value="<?php echo $realisateur['id_realisateur']; ?>"> 
+                    <?php echo $realisateur['realisateur']; ?> </option>
+                    <?php endforeach; ?>
+        </select>
+        
+        </div>
+
+        <!-- URL de l'image du film -->
+
+        <div class="form-group">
+            <label for="urlImageFilm">URL de l'image du film :</label>
+            <input required="required" type="url" id="urlImageFilm" name="urlImageFilm" />
+        </div>
+
+        <!-- Synopsis du film -->
+
+        <div class="form-group">
+            <label for="synopsisFilm">Synopsis du film :</label>
+            <textarea required="required" id="synopsisFilm" name="synopsisFilm"></textarea>
+        </div>
+
+        <!-- Note du film -->
+
+        <div class="form-group">
+            <label for="noteFilm">Note du film (sur 5) :</label>
+            <input required="required" type="number" id="noteFilm" name="noteFilm" min="0" max="5" />
+        </div>
+
+        <!-- Bouton submit -->
+
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+
+    </form>
 </div>
 
 

@@ -6,10 +6,6 @@ use Model\Connect;
 
 Class CinemaController {
 
-    /* ----------------- ADMIN ----------------- */
-
-
-
     /* ----------------- LISTE FILM - HOME ----------------- */
 
     public function home() {
@@ -219,7 +215,6 @@ Class CinemaController {
     }
 
     /* ----------------- LISTE GENRES - ADD GENRE ----------------- */
-
 
     public function addNouveauGenre() {
         $pdo = Connect::seConnecter();

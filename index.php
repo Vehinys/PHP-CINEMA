@@ -25,3 +25,5 @@ if (isset($_GET["action"])) {
         default                   : $ctrlCinema->Home();
     }
 }
+
+?>
