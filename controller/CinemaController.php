@@ -6,7 +6,7 @@ use Model\Connect;
 
 Class CinemaController {
 
-    /* ----------------- LISTE FILM - HOME ----------------- */
+    /* ----------------- HOME ----------------- */
 
     public function home() {
         $pdo = connect::seConnecter();
@@ -20,6 +20,7 @@ Class CinemaController {
         ");
 
         $requete2 = $pdo->query("
+
         WITH FilmsAleatoires AS (
         SELECT f.titre, f.urlImage, f.id_film, ROW_NUMBER() OVER (ORDER BY RAND()) AS row_num
         FROM film f)
@@ -31,7 +32,11 @@ Class CinemaController {
         require "view/home.php";
     }
 
-     /* ----------------- LISTE FILM - FILMS ----------------- */
+
+
+
+
+     /* ----------------- LISTE FILMS ----------------- */
 
     public function listFilms() {
         $pdo = connect::seConnecter();
@@ -45,7 +50,7 @@ Class CinemaController {
         ORDER BY titre ASC;
         ");
 
-        /* ----------------- REQUETE AFFICHAGE MENU DEROULANT ----------------- */
+        /* --- REQUETE AFFICHAGE MENU DEROULANT --- */
 
         $requeteReal = $pdo->query("
 
@@ -58,7 +63,7 @@ Class CinemaController {
         require "view/listFilms.php";
     }
 
-    /* ----------------- LISTE FILM - DETAILS FILM ----------------- */
+    /* --- LISTE FILM - DETAILS FILM --- */
         
     public function detailFilm($id) {
 
@@ -77,7 +82,7 @@ Class CinemaController {
         require "view/detailFilm.php";
     }
 
-    /* ----------------- LISTE FILM - ADD FILM ----------------- */
+    /* --- LISTE FILM - ADD FILM --- */
     
     public function addNouveauFilm() {
 
@@ -90,9 +95,6 @@ Class CinemaController {
             $urlImageFilm = filter_input(INPUT_POST, 'urlImageFilm', FILTER_SANITIZE_URL);
             $id_realisateurFilm = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
             $dateSortieFilm = filter_input(INPUT_POST, 'dateDeSortieEnFrance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-
-            var_dump($dateSortieFilm);
 
             // Vérification des données filtrées et validées
 
@@ -136,7 +138,11 @@ Class CinemaController {
         require "view/listFilms.php";
     }
 
-    /* ----------------- LISTE ACTEUR ----------------- */
+
+
+
+
+    /* ----------------- LISTE ACTEURS ----------------- */
 
     public function listActeurs() {
         $pdo = Connect::seConnecter();
@@ -149,7 +155,49 @@ Class CinemaController {
     
         require "view/listActeurs.php";
     }
+
+    /* --- LISTE FILM - DETAILS ACTEUR --- */
+        
+    public function detailActeur($id) {
+        $pdo = Connect::seConnecter();
+        
+        // Récupération des détails de l'acteur
+        $requete = $pdo->prepare("
+            SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'acteur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
+            FROM acteur a
+            INNER JOIN personne p ON a.id_personne = p.id_personne
+            WHERE a.id_acteur = :id
+            
+        ");
+        
+        $requete->execute(["id" => $id]);
+        
+        // Récupération des films de l'acteur
+
+        $requete2 = $pdo->prepare("
+        
+        SELECT f.titre, YEAR(dateDeSortieEnFrance) AS 'sortie', f.id_film, r.nomRole, GROUP_CONCAT(g.libelle) as genre,TIMESTAMPDIFF(YEAR, dateDeSortieEnFrance, CURDATE()) AS age
+        FROM film f
+        INNER JOIN film_genres fg ON f.id_film   = fg.id_film
+        INNER JOIN genre g        ON g.id_genre  = fg.id_genre
+        INNER JOIN casting c      ON c.id_film   = f.id_film
+        INNER JOIN acteur a       ON a.id_acteur = c.id_acteur
+        INNER JOIN role r         ON r.id_role   = c.id_role
+        WHERE a.id_acteur = :id
+        GROUP BY f.id_film,r.nomRole
+        ORDER BY age DESC;
+        
+        ");
+        
+        $requete2->execute(["id" => $id]);
     
+        // Passer les résultats à la vue
+        require "view/detailActeur.php";
+    }
+    
+
+    /* --- LISTE FILM - ADD ACTEUR --- */
+
     public function addNouveauActeur() {
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -183,13 +231,17 @@ Class CinemaController {
         require "view/listActeurs.php";
     }
 
+
+
+
+
     /* ----------------- LISTE REALISATEURS ----------------- */
 
     public function listRealisateurs() {
 
         $pdo = Connect::seConnecter();
         $requete = $pdo->query("
-            SELECT id_realisateur, prenom, nom, dateNaissance
+            SELECT id_realisateur, prenom, nom
             FROM realisateur re, personne p
             WHERE re.id_personne = p.id_personne
             ORDER BY nom
@@ -198,6 +250,48 @@ Class CinemaController {
         require "view/listRealisateurs.php";
 
         }
+
+    /* --- LISTE FILM - DETAILS REALISATEUR --- */
+        
+    public function detailRealisateur($id) {
+        $pdo = Connect::seConnecter();
+        
+        // Récupération des détails de l'acteur
+        $requete = $pdo->prepare("
+            SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'realisateur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
+            FROM acteur a
+            INNER JOIN personne p ON a.id_personne = p.id_personne
+            WHERE a.id_acteur = :id
+            
+        ");
+        
+        $requete->execute(["id" => $id]);
+        
+        // Récupération des films de l'acteur
+
+        $requete2 = $pdo->prepare("
+        
+        SELECT f.titre, YEAR(dateDeSortieEnFrance) AS 'sortie', f.id_film, GROUP_CONCAT(g.libelle) as genre,TIMESTAMPDIFF(YEAR, dateDeSortieEnFrance, CURDATE()) AS age
+        FROM film f
+        INNER JOIN film_genres fg ON f.id_film   = fg.id_film
+        INNER JOIN genre g        ON g.id_genre  = fg.id_genre
+        INNER JOIN casting c      ON c.id_film   = f.id_film
+        INNER JOIN acteur a       ON a.id_acteur = c.id_acteur
+        WHERE a.id_acteur = :id
+        GROUP BY f.id_film
+        ORDER BY age DESC;
+        
+        ");
+        
+        $requete2->execute(["id" => $id]);
+    
+        // Passer les résultats à la vue
+        require "view/detailRealisateur.php";
+    }
+
+
+
+
 
     /* ----------------- LISTE GENRES ----------------- */
 
@@ -214,7 +308,7 @@ Class CinemaController {
         require "view/listGenres.php";
     }
 
-    /* ----------------- LISTE GENRES - ADD GENRE ----------------- */
+    /* --- LISTE GENRES - ADD GENRE --- */
 
     public function addNouveauGenre() {
         $pdo = Connect::seConnecter();
