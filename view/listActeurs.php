@@ -17,12 +17,42 @@
         <?php } ?>
     </tbody>
 </table>
-
+<br><br>
 <!-- Formulaire pour ajouter un nouvel acteur ou une nouvelle actrice à la base de donnée -->
 <form action="index.php?action=ajouterNouvelActeur" method="post">
     <!-- choisir le nom -->
+    <div class="">
+
     <label for="nom">Nom :</label><br>
-    <input required="required" type="text" id="nom" name="nom" /><br>
+    <input required="required" type="text" id="nom" name="nom" /><br><br>
+
+    </div>
+
+    <div class="">
+
+        <label for="prenom">Prenom :</label><br>
+        <input required="required" type="text" id="prenom" name="prenom" /><br><br>
+
+    </div>
+
+    <div class="">
+
+        <label for="sexe">Sexe</label><br>
+        <input required="required" type="text" id="sexe" name="sexe" /><br><br>
+
+    </div>
+
+    <div class="">
+
+        <label for="dateDeNaissance">Date de naissance :</label><br>
+        <input required="required" type="date" id="dateDeNaissance" name="dateDeNaissance" min="1800-01-01" max="<?= date('Y-m-d');?>" /><br><br>
+
+    </div>
+
+
+
+
+
     <input type="submit" name="submit">
 </form>
 

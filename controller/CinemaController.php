@@ -32,10 +32,6 @@ Class CinemaController {
         require "view/home.php";
     }
 
-
-
-
-
      /* ----------------- LISTE FILMS ----------------- */
 
     public function listFilms() {
@@ -68,18 +64,60 @@ Class CinemaController {
     public function detailFilm($id) {
 
         $pdo = Connect::seConnecter();
+
         $requete = $pdo->prepare("
-    
-        SELECT f.titre, YEAR(dateDeSortieEnFrance) AS 'sortie', f.id_film, g.libelle
-        FROM film f
-        INNER JOIN film_genres fg ON f.id_film = fg.id_film
-        INNER JOIN genre g ON g.id_genre = fg.id_genre
-        WHERE f.id_film = :id
+            SELECT titre, id_film, urlImage
+            FROM film
+            WHERE id_film= :id");
+        $requete->execute(["id" => $id]); // requête récupère le titre et l'id du film
+
+        $requete1 = $pdo->prepare("
+
+            SELECT f.id_film, YEAR(dateDeSortieEnFrance) AS 'sortie', CONCAT(FLOOR(duree/60), ' h ',ROUND((duree/60 - FLOOR(duree/60)) * 60)) AS 'duree',GROUP_CONCAT(g.libelle) as genre
+            FROM film f
+            INNER JOIN film_genres fg ON fg.id_film= f.id_film
+            INNER JOIN genre g ON g.id_genre = fg.id_genre
+            WHERE f.id_film = :id
         ");
-            
-        $requete->execute(["id" => $id]); 
-    
-        require "view/detailFilm.php";
+
+        $requete1->execute(["id" => $id]); // requête qui récupère toutes les informations du film (titre, année de sortie, durée en h et min, prénom et nom du réalisateur)
+
+
+        $requete2 = $pdo->prepare("
+
+            SELECT f.id_film, CONCAT(prenom, ' ', nom) AS realisateur , re.id_realisateur
+            FROM film f, realisateur re, personne p
+            WHERE f.id_realisateur = re.id_realisateur
+            AND re.id_personne = p.id_personne 
+            AND id_film = :id 
+
+        ");
+
+        $requete2->execute(["id" => $id]); // requête qui récupère les genres associés au film
+
+
+        $requete3 = $pdo->prepare("
+            SELECT f.id_film, c.id_acteur, prenom, nom, nomRole
+            FROM personne p, film f, casting c, acteur a, role r
+            WHERE p.id_personne = a.id_personne
+            AND f.id_film = c.id_film
+            AND c.id_acteur = a.id_acteur
+            AND c.id_role = r.id_role
+            AND f.id_film = :id 
+        ");
+        $requete3->execute(["id" => $id]); // requête qui récupère tous les acteurs associés au film et le nom du rôle correspondant
+
+
+        $requete4 = $pdo->prepare("
+        SELECT f.synopsis, f.note
+        FROM film f
+        WHERE f.id_film =:id 
+   
+       ");
+       $requete4->execute(["id" => $id]); // requête qui récupère tous les acteurs associés au film et le nom du rôle correspondant
+
+       require "view/detailFilm.php";
+
     }
 
     /* --- LISTE FILM - ADD FILM --- */
@@ -138,10 +176,6 @@ Class CinemaController {
         require "view/listFilms.php";
     }
 
-
-
-
-
     /* ----------------- LISTE ACTEURS ----------------- */
 
     public function listActeurs() {
@@ -195,7 +229,6 @@ Class CinemaController {
         require "view/detailActeur.php";
     }
     
-
     /* --- LISTE FILM - ADD ACTEUR --- */
 
     public function addNouveauActeur() {
@@ -203,18 +236,29 @@ Class CinemaController {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $sexe = filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $dateDeNaissance = filter_input(INPUT_POST, 'dateDeNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $id_acteur = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
+
     
             // Vérification des données filtrées et validées
-            if ($nom !== false) {
+
+            
+            if ($nom && $prenom !== false && $sexe && $dateDeNaissance !== false && $id_acteur !== false) {
                 $pdo = Connect::seConnecter();
     
                 $requeteAddActeur = $pdo->prepare("
-                    INSERT INTO acteur (nom)
-                    VALUES (:nom)
+                    INSERT INTO acteur (nom, prenom, sexe, dateDeNaissance, id_acteur)
+                    VALUES (:nom, :prenomn, :sexe, :dateDeNaissance, :id_acteur)
                 ");
     
                 // Liaison des paramètres et exécution de la requête d'insertion
                 $requeteAddActeur->bindParam(':nom', $nom);
+                $requeteAddActeur->bindParam(':prenom', $prenom);
+                $requeteAddActeur->bindParam(':sexe', $sexe);
+                $requeteAddActeur->bindParam(':dateDeNaissance', $dateDeNaissance);
+                $requeteAddActeur->bindParam(':id_acteur', $id_acteur);
                 $requeteAddActeur->execute();
     
                 // Redirection vers la page listActeurs après l'insertion réussie
@@ -230,10 +274,6 @@ Class CinemaController {
         // Inclusion du fichier de vue pour afficher le formulaire
         require "view/listActeurs.php";
     }
-
-
-
-
 
     /* ----------------- LISTE REALISATEURS ----------------- */
 
@@ -288,10 +328,6 @@ Class CinemaController {
         // Passer les résultats à la vue
         require "view/detailRealisateur.php";
     }
-
-
-
-
 
     /* ----------------- LISTE GENRES ----------------- */
 
