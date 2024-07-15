@@ -17,6 +17,7 @@ Class CinemaController {
         SELECT titre, urlImage, id_film
         FROM DerniersFilms
         WHERE row_num <= 4;
+
         ");
 
         $requete2 = $pdo->query("
@@ -27,6 +28,7 @@ Class CinemaController {
         SELECT titre, urlImage, id_film
         FROM FilmsAleatoires
         WHERE row_num <= 4;
+
         ");
 
         require "view/home.php";
@@ -44,17 +46,28 @@ Class CinemaController {
         LEFT JOIN personne p ON re.id_personne = p.id_personne
         AND re.id_personne = p.id_personne
         ORDER BY titre ASC;
+
         ");
 
-        /* --- REQUETE AFFICHAGE MENU DEROULANT --- */
+        /* --- REQUETE REAL AFFICHAGE MENU DEROULANT --- */
 
         $requeteReal = $pdo->query("
 
         SELECT CONCAT(p.nom,' ', p.prenom) as realisateur ,id_realisateur
         FROM realisateur r
         INNER JOIN personne p ON p.id_personne = r.id_personne
+        
+        ");
 
-    ");
+        /* --- REQUETE ACT AFFICHAGE MENU DEROULANT --- */
+
+        $requeteAct = $pdo->query("
+        
+        SELECT CONCAT(p.nom,' ', p.prenom) as acteur ,id_acteur
+        FROM acteur a
+        INNER JOIN personne p ON p.id_personne = a.id_acteur
+        
+        ");    
 
         require "view/listFilms.php";
     }
@@ -66,18 +79,23 @@ Class CinemaController {
         $pdo = Connect::seConnecter();
 
         $requete = $pdo->prepare("
-            SELECT titre, id_film, urlImage
-            FROM film
-            WHERE id_film= :id");
+
+        SELECT titre, id_film, urlImage
+        FROM film
+        WHERE id_film= :id
+
+        ");
+
         $requete->execute(["id" => $id]); // requête récupère le titre et l'id du film
 
         $requete1 = $pdo->prepare("
 
-            SELECT f.id_film, YEAR(dateDeSortieEnFrance) AS 'sortie', CONCAT(FLOOR(duree/60), ' h ',ROUND((duree/60 - FLOOR(duree/60)) * 60)) AS 'duree',GROUP_CONCAT(g.libelle) as genre
-            FROM film f
-            INNER JOIN film_genres fg ON fg.id_film= f.id_film
-            INNER JOIN genre g ON g.id_genre = fg.id_genre
-            WHERE f.id_film = :id
+        SELECT f.id_film, YEAR(dateDeSortieEnFrance) AS 'sortie', CONCAT(FLOOR(duree/60), ' h ',ROUND((duree/60 - FLOOR(duree/60)) * 60)) AS 'duree',GROUP_CONCAT(g.libelle) as genre
+        FROM film f
+        INNER JOIN film_genres fg ON fg.id_film= f.id_film
+        INNER JOIN genre g ON g.id_genre = fg.id_genre
+        WHERE f.id_film = :id
+        
         ");
 
         $requete1->execute(["id" => $id]); // requête qui récupère toutes les informations du film (titre, année de sortie, durée en h et min, prénom et nom du réalisateur)
@@ -85,11 +103,11 @@ Class CinemaController {
 
         $requete2 = $pdo->prepare("
 
-            SELECT f.id_film, CONCAT(prenom, ' ', nom) AS realisateur , re.id_realisateur
-            FROM film f, realisateur re, personne p
-            WHERE f.id_realisateur = re.id_realisateur
-            AND re.id_personne = p.id_personne 
-            AND id_film = :id 
+        SELECT f.id_film, CONCAT(prenom, ' ', nom) AS realisateur , re.id_realisateur
+        FROM film f, realisateur re, personne p
+        WHERE f.id_realisateur = re.id_realisateur
+        AND re.id_personne = p.id_personne 
+        AND id_film = :id 
 
         ");
 
@@ -97,18 +115,22 @@ Class CinemaController {
 
 
         $requete3 = $pdo->prepare("
-            SELECT f.id_film, c.id_acteur, prenom, nom, nomRole
-            FROM personne p, film f, casting c, acteur a, role r
-            WHERE p.id_personne = a.id_personne
-            AND f.id_film = c.id_film
-            AND c.id_acteur = a.id_acteur
-            AND c.id_role = r.id_role
-            AND f.id_film = :id 
+
+        SELECT f.id_film, c.id_acteur, prenom, nom, nomRole
+        FROM personne p, film f, casting c, acteur a, role r
+        WHERE p.id_personne = a.id_personne
+        AND f.id_film = c.id_film
+        AND c.id_acteur = a.id_acteur
+        AND c.id_role = r.id_role
+        AND f.id_film = :id 
+
         ");
+
         $requete3->execute(["id" => $id]); // requête qui récupère tous les acteurs associés au film et le nom du rôle correspondant
 
 
         $requete4 = $pdo->prepare("
+
         SELECT f.synopsis, f.note
         FROM film f
         WHERE f.id_film =:id 
@@ -134,42 +156,43 @@ Class CinemaController {
             $id_realisateurFilm = filter_input(INPUT_POST, 'id_realisateurFilm', FILTER_VALIDATE_INT);
             $dateSortieFilm = filter_input(INPUT_POST, 'dateDeSortieEnFrance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-            // Vérification des données filtrées et validées
+    // Vérification des données filtrées et validées
 
-            if ($titreFilm && $dureeFilm !== false && $synopsisFilm && $noteFilm !== false && $urlImageFilm && $id_realisateurFilm !== false && $dateSortieFilm)  {
+        if ($titreFilm && $dureeFilm && $synopsisFilm && $noteFilm  && $urlImageFilm && $id_realisateurFilm && $dateSortieFilm !== false)  {
 
-                $pdo = Connect::seConnecter();
+            $pdo = Connect::seConnecter();
 
-                $requeteAddFilm = $pdo->prepare("
+            $requeteAddFilm = $pdo->prepare("
 
-                    INSERT INTO film (titre, duree, synopsis, note, urlImage, id_realisateur, dateDeSortieEnFrance)
-                    VALUES (:titre, :duree, :synopsis, :note, :urlImage, :id_realisateur, :dateDeSortieEnFrance)
-                ");
+            INSERT INTO film (titre, duree, synopsis, note, urlImage, id_realisateur, dateDeSortieEnFrance)
+            VALUES (:titre, :duree, :synopsis, :note, :urlImage, :id_realisateur, :dateDeSortieEnFrance)
+
+            ");
     
-                // Liaison des paramètres et exécution de la requête d'insertion
+    // Liaison des paramètres et exécution de la requête d'insertion
 
-                $requeteAddFilm->bindParam(':titre', $titreFilm);
-                $requeteAddFilm->bindParam(':duree', $dureeFilm);
-                $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
-                $requeteAddFilm->bindParam(':note', $noteFilm);
-                $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
-                $requeteAddFilm->bindParam(':id_realisateur', $id_realisateurFilm);
-                $requeteAddFilm->bindParam(':dateDeSortieEnFrance', $dateSortieFilm);
-                $requeteAddFilm->execute();
+            $requeteAddFilm->bindParam(':titre', $titreFilm);
+            $requeteAddFilm->bindParam(':duree', $dureeFilm);
+            $requeteAddFilm->bindParam(':synopsis', $synopsisFilm);
+            $requeteAddFilm->bindParam(':note', $noteFilm);
+            $requeteAddFilm->bindParam(':urlImage', $urlImageFilm);
+            $requeteAddFilm->bindParam(':id_realisateur', $id_realisateurFilm);
+            $requeteAddFilm->bindParam(':dateDeSortieEnFrance', $dateSortieFilm);
+            $requeteAddFilm->execute();
     
-                // Redirection vers la page listfilm après l'insertion réussie
+            // Redirection vers la page listfilm après l'insertion réussie
 
-                header("Location: index.php?action=listFilms");
+            header("Location: index.php?action=listFilms");
 
-                exit; // Arrête l'exécution du script après la redirection
+        exit; // Arrête l'exécution du script après la redirection
 
-            } else {
+        } else {
 
-                // Gestion des erreurs si les données ne sont pas valides
+            // Gestion des erreurs si les données ne sont pas valides
 
-                echo "Erreur : Veuillez vérifier les données saisies.";
-            }
+            echo "Erreur : Veuillez vérifier les données saisies.";
         }
+    }
     
         // Inclusion du fichier de vue pour afficher le formulaire
 
@@ -179,12 +202,15 @@ Class CinemaController {
     /* ----------------- LISTE ACTEURS ----------------- */
 
     public function listActeurs() {
+
         $pdo = Connect::seConnecter();
         $requete = $pdo->query("
-            SELECT a.id_acteur, p.prenom, p.nom
-            FROM acteur a
-            INNER JOIN personne p ON a.id_personne = p.id_personne
-            ORDER BY p.nom ASC
+
+        SELECT a.id_acteur, p.prenom, p.nom
+        FROM acteur a
+        INNER JOIN personne p ON a.id_personne = p.id_personne
+        ORDER BY p.nom ASC
+
         ");
     
         require "view/listActeurs.php";
@@ -197,10 +223,11 @@ Class CinemaController {
         
         // Récupération des détails de l'acteur
         $requete = $pdo->prepare("
-            SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'acteur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
-            FROM acteur a
-            INNER JOIN personne p ON a.id_personne = p.id_personne
-            WHERE a.id_acteur = :id
+
+        SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'acteur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
+        FROM acteur a
+        INNER JOIN personne p ON a.id_personne = p.id_personne
+        WHERE a.id_acteur = :id
             
         ");
         
@@ -238,33 +265,63 @@ Class CinemaController {
             $sexe          = filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $dateNaissance = filter_input(INPUT_POST, 'dateNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $id_personne   = filter_input(INPUT_POST, 'id_personne', FILTER_VALIDATE_INT);
+            $role          = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     
-            // Vérification des données filtrées et validées
+        // Vérification des données filtrées et validées
 
-            
-            if ($nom && $prenom && $sexe && $dateNaissance && $id_personne !== false) {
-                $pdo = Connect::seConnecter();
+        if ($nom && $prenom && $sexe && $dateNaissance && $role) {
+            $pdo = Connect::seConnecter();
     
-                $requeteAddActeur = $pdo->prepare("
-                    INSERT INTO personne (nom, prenom, sexe, dateNaissance, id_personne)
-                    VALUES (:nom, :prenom, :sexe, :dateNaissance, :id_personne)
-                ");
+            $requeteAddPersonne = $pdo->prepare("
+
+            INSERT INTO personne (nom, prenom, sexe, dateNaissance)
+            VALUES (:nom, :prenom, :sexe, :dateNaissance)
+
+            ");
     
-                // Liaison des paramètres et exécution de la requête d'insertion
-                $requeteAddActeur->bindParam(':nom', $nom);
-                $requeteAddActeur->bindParam(':prenom', $prenom);
-                $requeteAddActeur->bindParam(':sexe', $sexe);
-                $requeteAddActeur->bindParam(':dateNaissance', $dateNaissance);
-                $requeteAddActeur->bindParam(':id_personne', $id_personne);
-                $requeteAddActeur->execute();
+            // Liaison des paramètres et exécution de la requête d'insertion
+            $requeteAddPersonne->bindParam(':nom', $nom);
+            $requeteAddPersonne->bindParam(':prenom', $prenom);
+            $requeteAddPersonne->bindParam(':sexe', $sexe);
+            $requeteAddPersonne->bindParam(':dateNaissance', $dateNaissance);
+            $requeteAddPersonne->execute();
     
-                // Redirection vers la page listActeurs après l'insertion réussie
-                header("Location: index.php?action=listActeurs");
-                exit; // Arrête l'exécution du script après la redirection
+            // Récupérer l'id de la personne insérée
+            $id_personne = $pdo->lastInsertId();
     
-            } else {
-                // Gestion des erreurs si les données ne sont pas valides
-                echo "Erreur : Veuillez vérifier les données saisies.";
+            // Détermination du rôle et insertion dans la table appropriée
+    
+        if ($role === 'acteur' || $role === 'les deux') {
+            $requeteAddActeur = $pdo->prepare("
+
+            INSERT INTO acteur (id_personne)
+            VALUES (:id_personne)
+
+            ");
+
+            $requeteAddActeur->bindParam(':id_personne', $id_personne);
+            $requeteAddActeur->execute();
+        }
+    
+        if ($role === 'realisateur' || $role === 'les deux') {
+            $requeteAddRealisateur = $pdo->prepare("
+
+            INSERT INTO realisateur (id_personne)
+            VALUES (:id_personne)
+
+            ");
+
+            $requeteAddRealisateur->bindParam(':id_personne', $id_personne);
+            $requeteAddRealisateur->execute();
+        }
+    
+        // Redirection vers la page listActeurs après l'insertion réussie
+        header("Location: index.php?action=listActeurs");
+        exit; // Arrête l'exécution du script après la redirection
+    
+    } else {
+        // Gestion des erreurs si les données ne sont pas valides
+        echo "Erreur : Veuillez vérifier les données saisies.";
             }
         }
     
@@ -278,15 +335,17 @@ Class CinemaController {
 
         $pdo = Connect::seConnecter();
         $requete = $pdo->query("
-            SELECT id_realisateur, prenom, nom
-            FROM realisateur re, personne p
-            WHERE re.id_personne = p.id_personne
-            ORDER BY nom
+
+        SELECT id_realisateur, prenom, nom
+        FROM realisateur re, personne p
+        WHERE re.id_personne = p.id_personne
+        ORDER BY nom
+
         ");
 
         require "view/listRealisateurs.php";
 
-        }
+    }
 
     /* --- LISTE FILM - DETAILS REALISATEUR --- */
         
@@ -295,10 +354,11 @@ Class CinemaController {
         
         // Récupération des détails de l'acteur
         $requete = $pdo->prepare("
-            SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'realisateur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
-            FROM acteur a
-            INNER JOIN personne p ON a.id_personne = p.id_personne
-            WHERE a.id_acteur = :id
+
+        SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'realisateur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
+        FROM acteur a
+        INNER JOIN personne p ON a.id_personne = p.id_personne
+        WHERE a.id_acteur = :id
             
         ");
         
@@ -329,13 +389,16 @@ Class CinemaController {
     /* ----------------- LISTE GENRES ----------------- */
 
     public function listGenres() {
+
         $pdo = connect::seConnecter();
         $requete = $pdo->query("
+
         SELECT g.id_genre, libelle, COUNT(fg.id_film) as compte 
         FROM genre g 
         LEFT JOIN film_genres fg ON g.id_genre = fg.id_genre
         GROUP BY g.id_genre
         ORDER BY libelle
+
     ");
 
         require "view/listGenres.php";
@@ -349,8 +412,10 @@ Class CinemaController {
 
         if ($_POST["submit"]) {
             $requeteAjoutGenre = $pdo->prepare("
-                INSERT INTO genre (libelle)
-                VALUES (:libelle)
+
+            INSERT INTO genre (libelle)
+            VALUES (:libelle)
+
             ");
 
             $requeteAjoutGenre->bindParam(':libelle', $libelle);

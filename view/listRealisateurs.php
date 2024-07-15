@@ -4,9 +4,10 @@
 <table>
     <thead>
         <tr>
-            <th>liste des realisateurs</th>
+            <th>Liste des realisateurs</th>
         </tr>
     </thead>
+
     <tbody>
         <?php
         // Récupérer et afficher tous les acteurs

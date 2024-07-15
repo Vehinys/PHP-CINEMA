@@ -9,7 +9,7 @@
             <th>Les genres</th>
         </tr>
     </thead>
-
+    <br>
     <tbody>
         <?php
 
@@ -19,12 +19,14 @@
         ?>
             <tr>
 
-                <td><?= htmlspecialchars($genre["libelle"]) ?></td> <!-- récupérer et afficher le prénom de l'acteur -->
+                <td><?= $genre["libelle"] ?></td> <!-- récupérer et afficher le prénom de l'acteur -->
 
             </tr>
         <?php } ?>
     </tbody>
 </table>
+
+<br>
 
 
 <form action="index.php?action=addNouveauGenre" method="post">
