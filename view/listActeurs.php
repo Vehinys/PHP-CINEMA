@@ -50,9 +50,8 @@
         <input required="required" type="date" id="dateNaissance" name="dateNaissance" min="1800-01-01" max="<?= date('Y-m-d');?>" /><br><br>
 
     </div>
-
-
-  <legend>Rôle</legend>
+    
+    <legend>Rôle</legend>
 
     <div>
         <input type="radio" id="contactChoice1" name="contact" value="email" />
