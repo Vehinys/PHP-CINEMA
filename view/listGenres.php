@@ -8,6 +8,29 @@
     <input type='submit' name='submit'>
 </form>
 
+<table>
+    <thead>
+        <tr>
+            <th>Les genres</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <?php
+
+        // Récupérer et afficher tous les acteurs
+        foreach ($requete->fetchAll() as $genre) {
+
+        ?>
+            <tr>
+
+                <td><?= htmlspecialchars($genre["libelle"]) ?></td> <!-- récupérer et afficher le prénom de l'acteur -->
+
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+
 <?php
 $titre = "Liste des genres";
 $titre_secondaire = "Liste des genres";
