@@ -198,6 +198,41 @@ Class CinemaController {
 
         require "view/listFilms.php";
     }
+    
+    public function deleteFilm() {
+        $pdo = Connect::seConnecter();
+        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+    
+        if ($id_genre) {
+            $requeteSuppression = $pdo->prepare("
+                DELETE FROM genre
+                WHERE id_genre = :id_genre
+            ");
+            $requeteSuppression->bindParam(':id_genre', $id_genre);
+            $requeteSuppression->execute();
+    
+            header("Location: index.php?action=listGenres");
+        }
+    }
+    
+    public function editFilm() {
+        $pdo = Connect::seConnecter();
+        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+        $new_libelle = filter_input(INPUT_POST, 'new_libelle', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    
+        if ($id_genre && $new_libelle) {
+            $requeteModification = $pdo->prepare("
+                UPDATE genre
+                SET libelle = :new_libelle
+                WHERE id_genre = :id_genre
+            ");
+            $requeteModification->bindParam(':id_genre', $id_genre);
+            $requeteModification->bindParam(':new_libelle', $new_libelle);
+            $requeteModification->execute();
+    
+            header("Location: index.php?action=listGenres");
+        }
+    }
 
     /* ----------------- LISTE ACTEURS ----------------- */
 
@@ -329,6 +364,41 @@ Class CinemaController {
         require "view/listActeurs.php";
     }
 
+    public function deleteActeur() {
+        $pdo = Connect::seConnecter();
+        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+    
+        if ($id_genre) {
+            $requeteSuppression = $pdo->prepare("
+                DELETE FROM genre
+                WHERE id_genre = :id_genre
+            ");
+            $requeteSuppression->bindParam(':id_genre', $id_genre);
+            $requeteSuppression->execute();
+    
+            header("Location: index.php?action=listGenres");
+        }
+    }
+    
+    public function editActeur() {
+        $pdo = Connect::seConnecter();
+        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+        $new_libelle = filter_input(INPUT_POST, 'new_libelle', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    
+        if ($id_genre && $new_libelle) {
+            $requeteModification = $pdo->prepare("
+                UPDATE genre
+                SET libelle = :new_libelle
+                WHERE id_genre = :id_genre
+            ");
+            $requeteModification->bindParam(':id_genre', $id_genre);
+            $requeteModification->bindParam(':new_libelle', $new_libelle);
+            $requeteModification->execute();
+    
+            header("Location: index.php?action=listGenres");
+        }
+    }
+
     /* ----------------- LISTE REALISATEURS ----------------- */
 
     public function listRealisateurs() {
@@ -421,6 +491,41 @@ Class CinemaController {
             $requeteAjoutGenre->bindParam(':libelle', $libelle);
             $requeteAjoutGenre->execute();
 
+            header("Location: index.php?action=listGenres");
+        }
+    }
+
+    public function deleteGenre() {
+        $pdo = Connect::seConnecter();
+        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+    
+        if ($id_genre) {
+            $requeteSuppression = $pdo->prepare("
+                DELETE FROM genre
+                WHERE id_genre = :id_genre
+            ");
+            $requeteSuppression->bindParam(':id_genre', $id_genre);
+            $requeteSuppression->execute();
+    
+            header("Location: index.php?action=listGenres");
+        }
+    }
+    
+    public function editGenre() {
+        $pdo = Connect::seConnecter();
+        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+        $new_libelle = filter_input(INPUT_POST, 'new_libelle', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    
+        if ($id_genre && $new_libelle) {
+            $requeteModification = $pdo->prepare("
+                UPDATE genre
+                SET libelle = :new_libelle
+                WHERE id_genre = :id_genre
+            ");
+            $requeteModification->bindParam(':id_genre', $id_genre);
+            $requeteModification->bindParam(':new_libelle', $new_libelle);
+            $requeteModification->execute();
+    
             header("Location: index.php?action=listGenres");
         }
     }
