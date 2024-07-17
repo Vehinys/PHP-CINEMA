@@ -55,7 +55,7 @@
         // Récupérer et afficher tous les acteurs
         foreach ($requete->fetchAll() as $listActeurs) { ?>
             <tr>
-                <td><a href="index.php?action=detailActeur&id=<?= $listActeurs['id_acteur']?>"> <?= $listActeurs["nom"] ?> <?= $listActeurs["prenom"] ?></a></td>
+                <td> <?= $listActeurs["nom"] ?> <?= $listActeurs["prenom"] ?></a></td>
                 <td>
                     <form action="index.php?action=editActeur" method="post" style="display:inline;">
                         <input type="hidden" name="id_acteur" value="<?= $listActeurs['id_acteur'] ?>">
