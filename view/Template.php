@@ -56,7 +56,7 @@
     <footer>
 
         <small>Copyright &copy; 2024 | VehinysCompagny | Tous droits réservés.</small>
-        <p>About Us | Contact us | Privacy Policy</p>
+        <p>About Us | Contact us | Privacy Policy </p> 
 
     </footer>
 
