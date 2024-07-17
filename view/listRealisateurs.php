@@ -20,6 +20,8 @@
     </tbody>
 </table>
 
+<button> <a href="index.php?action=adminRealisateur"> Admin </a> </button>
+
 <?php
 $titre = "Film releases - Realisateurs";
 $contenu = ob_get_clean();

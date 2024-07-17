@@ -19,6 +19,9 @@ if (isset($_GET["action"])) {
 
         case "adminGenre"         : $ctrlCinema->adminGenre(); break;
         case "adminActeur"        : $ctrlCinema->adminActeur(); break;
+        case "adminRealisateur"   : $ctrlCinema->adminRealisateur(); break;
+        case "adminFilm"          : $ctrlCinema->adminFilm(); break;
+
 
         case "detailFilm"         : $ctrlCinema->detailFilm($id); break;
         case "detailActeur"       : $ctrlCinema->detailActeur($id); break;

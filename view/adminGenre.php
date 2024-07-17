@@ -6,7 +6,6 @@
     <thead>
         <tr>
             <th>Les genres</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <br>

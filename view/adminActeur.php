@@ -47,7 +47,6 @@
     <thead>
         <tr>
             <th>Les acteurs</th>
-            <th>Actions</th>
         </tr>
     </thead>
 
