@@ -9,9 +9,9 @@
     <tbody>
         <?php
         // Récupérer et afficher tous les acteurs
-        foreach ($requete->fetchAll() as $listActeurs) { ?>
+        foreach ($requete->fetchAll() as $acteur) { ?>
             <tr>
-                <td><a href="index.php?action=detailActeur&id=<?= $listActeurs['id_acteur']?>"> <?= $listActeurs["nom"] ?> <?= $listActeurs["prenom"] ?></a></td>
+                <td><a href="index.php?action=detailActeur&id=<?= $acteur['id_acteur']?>"> <?= $acteur["nom"] ?> <?= $acteur["prenom"] ?></a></td>
             </tr>
         <?php } ?>
     </tbody>

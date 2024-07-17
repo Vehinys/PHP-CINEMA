@@ -32,12 +32,12 @@ if (isset($_GET["action"])) {
         case "editFilm"           : $ctrlCinema->editFilm(); break;
 
         case "addNouveauActeur"   : $ctrlCinema->addNouveauActeur(); break;
-        case "deleteActeur"       : $ctrlCinema->deleteActeur(); break;
-        case "editActeur"         : $ctrlCinema->editActeur(); break;
+        case "deleteActeur"       : $ctrlCinema->deleteActeur($id); break;
+        case "editActeur"         : $ctrlCinema->editActeur($id); break;
 
         case "addNouveauGenre"    : $ctrlCinema->addNouveauGenre(); break;
-        case "deleteGenre"        : $ctrlCinema->deleteGenre(); break;
-        case "editGenre"          : $ctrlCinema->editGenre(); break;
+        case "deleteGenre"        : $ctrlCinema->deleteGenre($id); break;
+        case "editGenre"          : $ctrlCinema->editGenre($id); break;
         
         default                   : $ctrlCinema->Home();
     }

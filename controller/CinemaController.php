@@ -260,7 +260,7 @@ Class CinemaController {
         // Récupération des détails de l'acteur
         $requete = $pdo->prepare("
 
-        SELECT a.id_acteur, CONCAT(prenom, ' ', nom) as 'acteur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
+        SELECT p.id_personne, a.id_acteur, CONCAT(prenom, ' ', nom) as 'acteur', prenom, nom,DATE_FORMAT(dateNaissance, '%d/%m/%Y') AS naissance, sexe, TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) AS age 
         FROM acteur a
         INNER JOIN personne p ON a.id_personne = p.id_personne
         WHERE a.id_acteur = :id
@@ -470,7 +470,7 @@ Class CinemaController {
     public function adminActeur() {
         $pdo = Connect::seConnecter();
         $requete = $pdo->query("
-            SELECT a.id_acteur, p.prenom, p.nom
+            SELECT a.id_acteur, p.prenom, p.nom , p.id_personne
             FROM acteur a
             INNER JOIN personne p ON a.id_personne = p.id_personne
             ORDER BY p.nom ASC
@@ -548,59 +548,42 @@ Class CinemaController {
     
     /* --- ADMIN - DELETE ACTEUR --- */
 
-    public function deleteActeur() {
+    public function deleteActeur($id) {
         $pdo = Connect::seConnecter();
-        $id_acteur = filter_input(INPUT_POST, 'id_acteur', FILTER_VALIDATE_INT);
     
-        var_dump($id_acteur);
-    
-        if ($id_acteur) {
+    if ($id) {
 
-            $requetePersonne = $pdo->prepare("
+        $requetePersonne = $pdo->prepare("
 
-                SELECT id_personne 
-                FROM acteur 
-                WHERE id_acteur = :id_acteur
-            ");
+        DELETE FROM personne
+        WHERE id_personne = :id_personne
 
-            $requetePersonne->bindParam(':id_acteur', $id_acteur);
-            $requetePersonne->execute();
-            $id_personne = $requetePersonne->fetchColumn();
-    
-            if ($id_personne) {
+    ");
 
-                $requeteSuppPersonne = $pdo->prepare("
+        $requetePersonne->bindParam(':id_personne', $id);
+        $requetePersonne->execute();
 
-                    DELETE FROM personne
-                    WHERE id_personne = :id_personne
-                ");
+        header("Location: index.php?action=home");
 
-                $requeteSuppPersonne->bindParam(':id_personne', $id_personne);
-                $requeteSuppPersonne->execute();
-    
-            }
-    
-            $requeteSuppActeur = $pdo->prepare("
-
-                DELETE FROM acteur
-                WHERE id_acteur = :id_acteur
-
-            ");
-
-            $requeteSuppActeur->bindParam(':id_acteur', $id_acteur);
-            $requeteSuppActeur->execute();
-    
-            header("Location: index.php?action=adminActeur");
-            exit;
+        exit;
         }
+    
+        // Récupérer tous les acteurs pour les afficher dans la vue
+        
+        $requete = $pdo->prepare("
+            SELECT a.id_acteur, p.nom, p.prenom 
+            FROM acteur a
+            JOIN personne p ON a.id_personne = p.id_personne
+        ");
+        
+        $requete->execute();
     
         require "view/adminActeur.php";
     }
     
-
     /* --- ADMIN - EDITE ACTEUR --- */
     
-    public function editActeur() {
+    public function editActeur($id) {
 
         $pdo = Connect::seConnecter();
         $id_acteur = filter_input(INPUT_POST, 'id_acteur', FILTER_VALIDATE_INT);
