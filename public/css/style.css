@@ -234,6 +234,15 @@ td .films_text_titre {
     color: white;
 }
 
+.container_table_listGenres {
+    color: white;
+}
+
+.container_table_titre {
+    display: flex;
+    font-size: 20px;
+}
+
 /* ============================ detailFilm ============================ */
 
 .img_url {

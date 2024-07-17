@@ -3,10 +3,10 @@
 <!-- Formulaire d'ajout d'un genre -->
 
 
-<table>
-    <thead>
+<table class="container_table_listGenres">
+    <thead class="container_table_titre">
         <tr>
-            <th> Les genres </th>
+            <th><div id="rectangle_red"></div>  Les genres </th>
         </tr>
     </thead>
     <br>
