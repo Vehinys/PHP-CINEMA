@@ -374,103 +374,111 @@ Class CinemaController {
 
 /* ----------------------- ADMIN GENRE ----------------------- */
 
-    public function adminGenre() {
+/* Affiche la page d'administration des genres avec la liste des genres */
 
-        $pdo = connect::seConnecter();
-        $requete = $pdo->query("
+public function adminGenre() {
+    $pdo = Connect::seConnecter();
+    $requete = $pdo->query("
 
-        SELECT g.id_genre, libelle, COUNT(fg.id_film) as compte 
+        SELECT g.id_genre, libelle
         FROM genre g 
         LEFT JOIN film_genres fg ON g.id_genre = fg.id_genre
         GROUP BY g.id_genre
         ORDER BY libelle
 
-        ");
+    ");
 
-        require "view/adminGenre.php";
-    }
+    require "view/adminGenre.php";
+}
 
 /* -------------------- ADMIN - ADD GENRE -------------------- */
 
-    public function addNouveauGenre() {
-        $pdo = Connect::seConnecter();
+/* Ajoute un nouveau genre à la base de données */
 
-        $libelle = filter_input(INPUT_POST, 'addGenre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+public function addNouveauGenre() {
+    $pdo = Connect::seConnecter();
 
-        if ($_POST["submit"]) {
+    $libelle = filter_input(INPUT_POST, 'addGenre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-            $requeteAjoutGenre = $pdo->prepare("
+    if (isset($_POST["submit"])) {
+        $requeteAjoutGenre = $pdo->prepare("
 
             INSERT INTO genre (libelle)
             VALUES (:libelle)
 
-            ");
+        ");
 
-            $requeteAjoutGenre->bindParam(':libelle', $libelle);
-            $requeteAjoutGenre->execute();
+        $requeteAjoutGenre->bindParam(':libelle', $libelle);
+        $requeteAjoutGenre->execute();
 
-            header("Location: index.php?action=adminGenre");
-        }
+        header("Location: index.php?action=adminGenre");
     }
+}
 
 /* -------------------- ADMIN - EDIT GENRE -------------------- */
-    
-    public function editGenre($id, $new_libelle) {
 
-        $pdo = Connect::seConnecter();
-    
-        $id_genre = filter_var($id, FILTER_VALIDATE_INT);
-        $new_libelle = htmlspecialchars(trim($new_libelle), ENT_QUOTES, 'UTF-8');
-    
-        if ($id_genre && $new_libelle) {
-            $requeteModification = $pdo->prepare("
+/* Modifie le libellé d'un genre existant */
 
-                UPDATE genre
-                SET libelle = :new_libelle
-                WHERE id_genre = :id_genre
+public function editGenre($id, $new_libelle) {
+    $pdo = Connect::seConnecter();
 
-            ");
-    
-            $requeteModification->bindParam(':id_genre', $id_genre);
-            $requeteModification->bindParam(':new_libelle', $new_libelle);
-            $requeteModification->execute();
-    
-            header("Location: index.php?action=adminGenre");
+    $id_genre = filter_var($id, FILTER_VALIDATE_INT);
+    $new_libelle = htmlspecialchars(trim($new_libelle), ENT_QUOTES, 'UTF-8');
 
-            exit;  // Assurez-vous de terminer le script après la redirection
+    if ($id_genre && $new_libelle) {
+        $requeteModification = $pdo->prepare("
 
-        } else {
+            UPDATE genre
+            SET libelle = :new_libelle
+            WHERE id_genre = :id_genre
 
-            echo "ID de genre ou libellé invalide.";
+        ");
 
-        }
+        $requeteModification->bindParam(':id_genre', $id_genre);
+        $requeteModification->bindParam(':new_libelle', $new_libelle);
+        $requeteModification->execute();
 
+        header("Location: index.php?action=adminGenre");
+
+        exit;
+
+    } else {
+
+        echo "ID de genre ou libellé invalide.";
     }
-    
+}
+
 /* -------------------- ADMIN - DELETE GENRE -------------------- */
 
-    public function deleteGenre($id) {
-        $pdo = Connect::seConnecter();
-    
-        $id_genre = filter_var($id, FILTER_VALIDATE_INT);
-    
-        if ($id_genre) {
-            $requeteSuppression = $pdo->prepare("
-                DELETE FROM genre
-                WHERE id_genre = :id_genre
-            ");
-    
-            $requeteSuppression->bindParam(':id_genre', $id_genre);
-            $requeteSuppression->execute();
-    
-            header("Location: index.php?action=adminGenre");
-            exit;
+/* Supprime un genre de la base de données */
 
-        } else {
+public function deleteGenre($id) {
+    $pdo = Connect::seConnecter();
 
-            echo "ID de genre invalide.";
-        }
+    $id_genre = filter_var($id, FILTER_VALIDATE_INT);
+
+    if ($id_genre) {
+        $requeteSuppression = $pdo->prepare("
+
+            DELETE FROM genre
+            WHERE id_genre = :id_genre
+
+        ");
+
+        $requeteSuppression->bindParam(':id_genre', $id_genre);
+        $requeteSuppression->execute();
+
+        header("Location: index.php?action=adminGenre");
+
+        exit;
+
+    } else {
+
+        echo "ID de genre invalide.";
+        
     }
+}
+
 
 /* ----------------------- ADMIN ACTEUR ----------------------- */
 
@@ -488,7 +496,7 @@ Class CinemaController {
         ");
 
     require "view/adminGenre.php";
-    
+
     }
 
 }
