@@ -567,65 +567,183 @@ public function deleteActeur($id) {
 }
 
 // Méthode pour modifier un acteur
+
 public function editActeur($id) {
     $pdo = Connect::seConnecter();
-    $id_acteur = filter_var($id, FILTER_VALIDATE_INT);
 
-    if ($id_acteur) {
-        // Récupération des nouvelles données depuis le formulaire
-        $new_nom = $_POST['new_nom'];
-        $new_prenom = $_POST['new_prenom'];
-        $new_sexe = $_POST['new_sexe'];
-        $new_dateNaissance = $_POST['new_dateNaissance'];
+    // Récupération et validation de l'ID de l'acteur
+    $id_acteur = filter_input(INPUT_POST, 'id_acteur', FILTER_VALIDATE_INT);
+    
+    // Vérification de la validité de l'ID
+    if (!$id_acteur) {
+        echo "ID d'acteur invalide.";
+        return;
+    }
+    
+    // Récupération des nouvelles données depuis le formulaire
+    $new_nom = filter_input(INPUT_POST, 'new_nom', FILTER_SANITIZE_SPECIAL_CHARS);
+    $new_prenom = filter_input(INPUT_POST, 'new_prenom', FILTER_SANITIZE_SPECIAL_CHARS);
+    $new_sexe = filter_input(INPUT_POST, 'new_sexe', FILTER_SANITIZE_SPECIAL_CHARS);
+    $new_dateNaissance = $_POST['new_dateNaissance']; // Ajustez ce traitement selon vos besoins de validation
 
-        // Préparation de la requête de mise à jour
-        $requeteModification = $pdo->prepare("
-            UPDATE personne
-            SET nom = :nom, prenom = :prenom, sexe = :sexe, date_naissance = :date_naissance
-            WHERE id_personne = :id_personne
+    // Préparation de la requête de mise à jour
+    $requeteModification = $pdo->prepare("
+
+        UPDATE personne p
+        JOIN acteur a ON a.id_personne = p.id_personne
+        SET nom = :new_nom , prenom = :new_prenom, sexe = :new_sexe, dateNaissance = :new_dateNaissance
+        WHERE id_acteur = :id_acteur
+
+    ");
+
+    // Liaison des paramètres et exécution de la requête
+    $requeteModification->bindParam(':new_nom', $new_nom);
+    $requeteModification->bindParam(':new_prenom', $new_prenom);
+    $requeteModification->bindParam(':new_sexe', $new_sexe);
+    $requeteModification->bindParam(':new_dateNaissance', $new_dateNaissance);
+    $requeteModification->bindParam(':id_acteur', $id_acteur);
+    $requeteModification->execute();
+
+    // Redirection après la modification
+    header("Location: index.php?action=adminActeur");
+    exit;
+}
+
+
+/* ----------------------- ADMIN REALISATEUR ----------------------- */
+
+ // Méthode pour afficher la vue d'administration des acteurs
+ public function adminRealisateur() {
+    $pdo = Connect::seConnecter();
+    $requete = $pdo->query("
+        SELECT r.id_realisateur, p.prenom, p.nom
+        FROM realisateur r
+        INNER JOIN personne p ON r.id_personne = p.id_personne
+        ORDER BY p.nom ASC
+    ");
+    require "view/adminRealisateur.php";
+}
+
+// Méthode pour ajouter un nouvel realisateur
+
+public function addRealisateur() {
+    $pdo = Connect::seConnecter();
+
+    if (isset($_POST["submit"])) {
+
+        // Récupération des données du formulaire
+
+        $nom    = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $sexe   = $_POST['sexe'];
+        $jour   = $_POST['jour'];
+        $mois   = $_POST['mois'];
+        $annee  = $_POST['annee'];
+        
+        // Formatage de la date de naissance
+        $dateNaissance = "$annee-$mois-$jour";
+
+        // Début de la transaction
+        $pdo->beginTransaction();
+
+        // 1. Insérer dans la table personne
+        $requeteAjoutPersonne = $pdo->prepare("
+
+            INSERT INTO personne (nom, prenom, sexe, dateNaissance)
+            VALUES (:nom, :prenom, :sexe, :dateNaissance)
         ");
-        $requeteModification->bindParam(':nom', $new_nom);
-        $requeteModification->bindParam(':prenom', $new_prenom);
-        $requeteModification->bindParam(':sexe', $new_sexe);
-        $requeteModification->bindParam(':date_naissance', $new_dateNaissance);
-        $requeteModification->bindParam(':id_personne', $id_acteur);
-        $requeteModification->execute();
 
-        header("Location: index.php?action=adminActeur");
+        $requeteAjoutPersonne->bindParam(':nom', $nom);
+        $requeteAjoutPersonne->bindParam(':prenom', $prenom);
+        $requeteAjoutPersonne->bindParam(':sexe', $sexe);
+        $requeteAjoutPersonne->bindParam(':dateNaissance', $dateNaissance);
+        $requeteAjoutPersonne->execute();
+        
+        // Récupérer l'id_personne généré
+        $id_personne = $pdo->lastInsertId();
+
+        // 2. Insérer dans la table acteur
+        $requeteAjoutRealisateur = $pdo->prepare("
+            INSERT INTO realisateur (id_personne)
+            VALUES (:id_personne)
+        ");
+        $requeteAjoutRealisateur->bindParam(':id_personne', $id_personne);
+        $requeteAjoutRealisateur->execute();
+
+        // Validation de la transaction
+        $pdo->commit();
+
+        // Redirection vers la page d'administration des acteurs
+        header("Location: index.php?action=adminRealisateur");
+
+        exit;
+    }
+}
+
+
+// Méthode pour supprimer un acteur
+
+public function deleteRealisateur($id) {
+    $pdo = Connect::seConnecter();
+    $id_realisateur = filter_var($id, FILTER_VALIDATE_INT);
+
+    if ($id_realisateur) {
+        $requeteSuppression = $pdo->prepare("
+            DELETE FROM realisateur
+            WHERE id_realisateur = :id_realisateur
+        ");
+        $requeteSuppression->bindParam(':id_realisateur', $id_realisateur);
+        $requeteSuppression->execute();
+
+        header("Location: index.php?action=adminRealisateur");
         exit;
     } else {
         echo "ID d'acteur invalide.";
     }
 }
 
-public function deletePersonne($id) {
+// Méthode pour modifier un acteur
+
+public function editRealisateur($id) {
     $pdo = Connect::seConnecter();
-    $id_personne = filter_var($id, FILTER_VALIDATE_INT);
 
-    if ($id_personne) {
-        // Suppression dans la table personne
-        $requeteSuppressionPersonne = $pdo->prepare("
-            DELETE FROM personne
-            WHERE id_personne = :id_personne
-        ");
-        $requeteSuppressionPersonne->bindParam(':id_personne', $id_personne);
-        $requeteSuppressionPersonne->execute();
-
-        // Suppression dans la table acteur (si la personne était aussi un acteur)
-        $requeteSuppressionActeur = $pdo->prepare("
-            DELETE FROM acteur
-            WHERE id_personne = :id_personne
-        ");
-        $requeteSuppressionActeur->bindParam(':id_personne', $id_personne);
-        $requeteSuppressionActeur->execute();
-
-        header("Location: index.php?action=adminActeur");
-        exit;
-    } else {
-        echo "ID de personne invalide.";
+    // Récupération et validation de l'ID de l'acteur
+    $id_realisateur = filter_input(INPUT_POST, 'id_realisateur', FILTER_VALIDATE_INT);
+    
+    // Vérification de la validité de l'ID
+    if (!$id_realisateur) {
+        echo "ID d'acteur invalide.";
+        return;
     }
-}
+    
+    // Récupération des nouvelles données depuis le formulaire
+    $new_nom = filter_input(INPUT_POST, 'new_nom', FILTER_SANITIZE_SPECIAL_CHARS);
+    $new_prenom = filter_input(INPUT_POST, 'new_prenom', FILTER_SANITIZE_SPECIAL_CHARS);
+    $new_sexe = filter_input(INPUT_POST, 'new_sexe', FILTER_SANITIZE_SPECIAL_CHARS);
+    $new_dateNaissance = $_POST['new_dateNaissance']; // Ajustez ce traitement selon vos besoins de validation
 
+    // Préparation de la requête de mise à jour
+    $requeteModification = $pdo->prepare("
+
+        UPDATE personne p
+        JOIN realisateur r ON r.id_personne = p.id_personne
+        SET nom = :new_nom , prenom = :new_prenom, sexe = :new_sexe, dateNaissance = :new_dateNaissance
+        WHERE id_realisateur = :id_realisateur
+
+    ");
+
+    // Liaison des paramètres et exécution de la requête
+    $requeteModification->bindParam(':new_nom', $new_nom);
+    $requeteModification->bindParam(':new_prenom', $new_prenom);
+    $requeteModification->bindParam(':new_sexe', $new_sexe);
+    $requeteModification->bindParam(':new_dateNaissance', $new_dateNaissance);
+    $requeteModification->bindParam(':id_realisateur', $id_realisateur);
+    $requeteModification->execute();
+
+    // Redirection après la modification
+    header("Location: index.php?action=adminRealisateur");
+    exit;
+}
 
 
 }

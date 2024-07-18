@@ -46,7 +46,7 @@
                         } ?>
                     </select><br><br>
 
-                    <input type="submit" name="submit" value="Ajouter">
+                    <button type="submit" name="submit">Ajouter</button>
                 </form>
             </td>
         </tr>
@@ -61,12 +61,7 @@
                 <td>
                     <form action="index.php?action=deleteActeur&id=<?= $acteur['id_acteur'] ?>" method="post" style="display:inline;">
                         <input type="hidden" name="id_acteur" value="<?= $acteur['id_acteur'] ?>">
-                        <input type="submit" value="Supprimer l'acteur" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet acteur ?');">
-                    </form>
-
-                    <form action="index.php?action=deletePersonne&id=<?= $acteur['id_personne'] ?>" method="post" style="display:inline;">
-                        <input type="hidden" name="id_personne" value="<?= $acteur['id_personne'] ?>">
-                        <input type="submit" value="Supprimer la personne" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette personne ?');">
+                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet acteur ?');">Supprimer son role</button>
                     </form>
 
                     <form action="index.php?action=editActeur&id=<?= $acteur['id_acteur'] ?>" method="post" style="display:inline;">
@@ -78,7 +73,7 @@
                             <option value="Femme">Femme</option>
                         </select>
                         <input type="date" name="new_dateNaissance" required max="<?= date('Y-m-d'); ?>">
-                        <input type="submit" value="Modifier">
+                        <button type="submit">Modifier</button>
                     </form>
                 </td>
             </tr>
@@ -86,13 +81,9 @@
     </tbody>
 </table>
 
-
 <br>
 
-
-
-<br>
-<button><a href="index.php?action=listActeur">Retour</a></button>
+<button><a href="index.php?action=listActeurs">Retour</a></button>
 
 <?php
 $titre = "Administration Acteur";
