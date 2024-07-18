@@ -745,19 +745,76 @@ public function editRealisateur($id) {
     header("Location: index.php?action=adminRealisateur");
     exit;
 }
+/* ----------------------- ADMIN ADMIN ----------------------- */
 
- public function adminFilm() {
+public function adminFilm() {
     $pdo = Connect::seConnecter();
-    $requete = $pdo->query("
-        SELECT f.titre, p.prenom, p.nom
-        FROM realisateur r
-        INNER JOIN personne p ON r.id_personne = p.id_personne
-        ORDER BY p.nom ASC
+    
+    $films = $pdo->query("
+        SELECT titre, id_film
+        FROM film
+        ");
+    // récupère la liste des films pour le premier menu déroulant
+
+    $acteurs = $pdo->query("
+        SELECT a.id_personne, a.id_acteur, CONCAT(nom, ' ', prenom) as 'acteur'
+        FROM personne p, acteur a
+        WHERE p.id_personne = a.id_personne
+        ORDER BY nom
     ");
-    require "view/adminRealisateur.php";
+    // récupère la liste des acteurs pour le second menu déroulant
+
+    $roles = $pdo->query("
+        SELECT id_role, nomRole
+        FROM role
+        ORDER BY nomRole
+    ");
+    // récupère la liste de tous les rôles présents en BDD pour le troisième menu déroulant
+
+require "view\adminFilm.php";
 }
 
+public function addCasting() {
+
+    $film = filter_input(INPUT_POST, 'film'); // récupère le film choisi par l'utilisateur sur la page de modification de casting
+    $acteur = filter_input(INPUT_POST, 'acteur'); // récupère l'acteur choisi par l'utilisateur à associer au film et au rôle
+    $role = filter_input(INPUT_POST, 'role'); // récupère le rôle choisi par l'utilisateur à associer au film et à l'acteur
+
+    if($_POST["submit"]) {
+
+        $pdo = Connect::seConnecter(); 
+
+        $requeteAjoutCasting = $pdo->query("
+            INSERT INTO casting (id_film, id_acteur, id_role)
+            VALUES ('$film', '$acteur', '$role')
+        "); // requête qui ajoute l'association des trois valeurs à la table casting
+    }
+}
+
+// fonction pour afficher le formulaire d'ajout de rôle à la BDD
+public function afficherFormulaireRole() {
+    require 'view\adminFilm.php';
+}
+
+// fonction qui permet d'ajouter le rôle que l'on souhaite créer à la BDD 
+public function ajouterNouveauRole() {
+
+    $pdo = Connect::seConnecter();
+
+    $role = filter_input(INPUT_POST, 'nomRole', FILTER_SANITIZE_FULL_SPECIAL_CHARS); // récupère et filtre la valeur saisie par l'utilisateur
+
+    if ($_POST['submit']) { 
+
+        $requeteAjoutRole = $pdo->query("
+            INSERT INTO role (nomRole)
+            VALUES ('$role')
+        "); // requete qui ajoute le nouveau rôle à la BDD
+    }
+    header("Location: index.php?action=adminFilm");
+    exit;
+}
 
 }
+
 
 
