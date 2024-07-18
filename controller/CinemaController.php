@@ -36,43 +36,41 @@ Class CinemaController {
 
      /* ----------------- LISTE FILMS ----------------- */
 
-     public function listFilms() {
-        $pdo = Connect::seConnecter();
-    
-        // Requête pour récupérer la liste des films avec leurs détails
+    public function listFilms() {
+        $pdo = connect::seConnecter();
         $requete = $pdo->query("
 
-            SELECT f.id_film, titre, YEAR(dateDeSortieEnFrance) as 'year', CONCAT(prenom, ' ', nom) as 'realisateur', f.id_realisateur, f.urlImage
-            FROM film f
-            LEFT JOIN realisateur re ON f.id_realisateur = re.id_realisateur
-            LEFT JOIN personne p ON re.id_personne = p.id_personne
-            ORDER BY titre ASC;
+        SELECT f.id_film, titre, YEAR(dateDeSortieEnFrance) as 'year', CONCAT(prenom, ' ', nom) as 'realisateur', f.id_realisateur,f.urlImage
+        FROM film f
+        LEFT JOIN realisateur re ON f.id_realisateur = re.id_realisateur
+        LEFT JOIN personne p ON re.id_personne = p.id_personne
+        AND re.id_personne = p.id_personne
+        ORDER BY titre ASC;
 
         ");
-    
-        // Requête pour récupérer la liste des roles pour la liste déroulante
-        $requeteRole = $pdo->query("
 
-            SELECT  r.nomRole, r.id_role,f.titre
-            FROM film f 
-            INNER JOIN casting c ON c.id_film = f.id_film
-            INNER JOIN role r ON	r.id_role = c.id_role
-            
+        /* --- REQUETE REAL AFFICHAGE MENU DEROULANT --- */
+
+        $requeteReal = $pdo->query("
+
+        SELECT CONCAT(p.nom,' ', p.prenom) as realisateur ,id_realisateur
+        FROM realisateur r
+        INNER JOIN personne p ON p.id_personne = r.id_personne
+        
         ");
-    
-        // Requête pour récupérer la liste des acteurs pour la liste déroulante
+
+        /* --- REQUETE ACT AFFICHAGE MENU DEROULANT --- */
+
         $requeteAct = $pdo->query("
+        
+        SELECT CONCAT(p.nom,' ', p.prenom) as acteur ,id_acteur
+        FROM acteur a
+        INNER JOIN personne p ON p.id_personne = a.id_acteur
+        
+        ");    
 
-            SELECT CONCAT(p.nom, ' ', p.prenom) as acteur, id_acteur
-            FROM acteur a
-            INNER JOIN personne p ON p.id_personne = a.id_personne;
-
-        ");
-    
-        // Inclusion de la vue qui affiche la liste des films
-        require "view/listFilms.php";
+    require "view/listFilms.php";
     }
-    
 
     /* --- LISTE FILM - DETAILS FILM --- */
         
@@ -683,6 +681,7 @@ public function addRealisateur() {
     }
 }
 
+
 // Méthode pour supprimer un acteur
 
 public function deleteRealisateur($id) {
@@ -750,44 +749,13 @@ public function editRealisateur($id) {
  public function adminFilm() {
     $pdo = Connect::seConnecter();
     $requete = $pdo->query("
-        SELECT f.titre
-        FROM film f
-        ORDER BY f.titre ASC
+        SELECT f.titre, p.prenom, p.nom
+        FROM realisateur r
+        INNER JOIN personne p ON r.id_personne = p.id_personne
+        ORDER BY p.nom ASC
     ");
-
-    require "view/adminFilm.php";
+    require "view/adminRealisateur.php";
 }
-public function addCasting() {
-    $pdo = Connect::seConnecter();
-
-    // Fetch actors
-    $requeteActeurs = $pdo->query("
-        SELECT a.id_acteur, CONCAT(p.prenom, ' ', p.nom) AS nom_complet
-        FROM acteur a
-        INNER JOIN personne p ON a.id_personne = p.id_personne
-        ORDER BY nom_complet ASC
-    ");
-    $acteurs = $requeteActeurs->fetchAll();
-
-    // Fetch films
-    $requeteFilms = $pdo->query("
-        SELECT id_film, titre
-        FROM film
-        ORDER BY titre ASC
-    ");
-    $films = $requeteFilms->fetchAll();
-
-    // Fetch roles
-    $requeteRoles = $pdo->query("
-        SELECT id_role, description
-        FROM role
-        ORDER BY description ASC
-    ");
-    $roles = $requeteRoles->fetchAll();
-
-    require "view/adminFilm.php";  // Adjust the view file path accordingly
-}
-
 
 
 }
