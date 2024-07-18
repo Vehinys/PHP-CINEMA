@@ -21,6 +21,7 @@ if (isset($_GET["action"])) {
         case "listRealisateurs"  : $ctrlCinema->listRealisateurs(); break;
 
         case "adminGenre"        : $ctrlCinema->adminGenre(); break;
+        case "adminFilm"         : $ctrlCinema->adminFilm(); break;
         case "adminActeur"       : $ctrlCinema->adminActeur(); break;
         case "adminRealisateur"  : $ctrlCinema->adminRealisateur(); break;
 
@@ -39,6 +40,8 @@ if (isset($_GET["action"])) {
         case "addNouveauGenre"   : $ctrlCinema->addNouveauGenre(); break;
         case "editGenre"         : $ctrlCinema->editGenre($id, $new_libelle); break;
         case "deleteGenre"       : $ctrlCinema->deleteGenre($id); break;
+
+        case "addCasting"        : $ctrlCinema->addCasting(); break;
 
         default                  : $ctrlCinema->Home();
     }

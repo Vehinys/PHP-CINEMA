@@ -36,41 +36,43 @@ Class CinemaController {
 
      /* ----------------- LISTE FILMS ----------------- */
 
-    public function listFilms() {
-        $pdo = connect::seConnecter();
+     public function listFilms() {
+        $pdo = Connect::seConnecter();
+    
+        // Requête pour récupérer la liste des films avec leurs détails
         $requete = $pdo->query("
 
-        SELECT f.id_film, titre, YEAR(dateDeSortieEnFrance) as 'year', CONCAT(prenom, ' ', nom) as 'realisateur', f.id_realisateur,f.urlImage
-        FROM film f
-        LEFT JOIN realisateur re ON f.id_realisateur = re.id_realisateur
-        LEFT JOIN personne p ON re.id_personne = p.id_personne
-        AND re.id_personne = p.id_personne
-        ORDER BY titre ASC;
+            SELECT f.id_film, titre, YEAR(dateDeSortieEnFrance) as 'year', CONCAT(prenom, ' ', nom) as 'realisateur', f.id_realisateur, f.urlImage
+            FROM film f
+            LEFT JOIN realisateur re ON f.id_realisateur = re.id_realisateur
+            LEFT JOIN personne p ON re.id_personne = p.id_personne
+            ORDER BY titre ASC;
 
         ");
+    
+        // Requête pour récupérer la liste des roles pour la liste déroulante
+        $requeteRole = $pdo->query("
 
-        /* --- REQUETE REAL AFFICHAGE MENU DEROULANT --- */
-
-        $requeteReal = $pdo->query("
-
-        SELECT CONCAT(p.nom,' ', p.prenom) as realisateur ,id_realisateur
-        FROM realisateur r
-        INNER JOIN personne p ON p.id_personne = r.id_personne
-        
+            SELECT  r.nomRole, r.id_role,f.titre
+            FROM film f 
+            INNER JOIN casting c ON c.id_film = f.id_film
+            INNER JOIN role r ON	r.id_role = c.id_role
+            
         ");
-
-        /* --- REQUETE ACT AFFICHAGE MENU DEROULANT --- */
-
+    
+        // Requête pour récupérer la liste des acteurs pour la liste déroulante
         $requeteAct = $pdo->query("
-        
-        SELECT CONCAT(p.nom,' ', p.prenom) as acteur ,id_acteur
-        FROM acteur a
-        INNER JOIN personne p ON p.id_personne = a.id_acteur
-        
-        ");    
 
-    require "view/listFilms.php";
+            SELECT CONCAT(p.nom, ' ', p.prenom) as acteur, id_acteur
+            FROM acteur a
+            INNER JOIN personne p ON p.id_personne = a.id_personne;
+
+        ");
+    
+        // Inclusion de la vue qui affiche la liste des films
+        require "view/listFilms.php";
     }
+    
 
     /* --- LISTE FILM - DETAILS FILM --- */
         
@@ -495,17 +497,18 @@ public function deleteGenre($id) {
 }
 
 // Méthode pour ajouter un nouvel acteur
+
 public function addNouveauActeur() {
     $pdo = Connect::seConnecter();
 
     if (isset($_POST["submit"])) {
         // Récupération des données du formulaire
-        $nom = $_POST['nom'];
-        $prenom = $_POST['prenom'];
-        $sexe = $_POST['sexe'];
-        $jour = $_POST['jour'];
-        $mois = $_POST['mois'];
-        $annee = $_POST['annee'];
+        $nom = htmlspecialchars($_POST['nom'], ENT_QUOTES, 'UTF-8');
+        $prenom = htmlspecialchars($_POST['prenom'], ENT_QUOTES, 'UTF-8');
+        $sexe = htmlspecialchars($_POST['sexe'], ENT_QUOTES, 'UTF-8');
+        $jour = filter_var($_POST['jour'], FILTER_SANITIZE_NUMBER_INT);
+        $mois = filter_var($_POST['mois'], FILTER_SANITIZE_NUMBER_INT);
+        $annee = filter_var($_POST['annee'], FILTER_SANITIZE_NUMBER_INT);
         
         // Formatage de la date de naissance
         $dateNaissance = "$annee-$mois-$jour";
@@ -680,7 +683,6 @@ public function addRealisateur() {
     }
 }
 
-
 // Méthode pour supprimer un acteur
 
 public function deleteRealisateur($id) {
@@ -745,5 +747,49 @@ public function editRealisateur($id) {
     exit;
 }
 
+ public function adminFilm() {
+    $pdo = Connect::seConnecter();
+    $requete = $pdo->query("
+        SELECT f.titre
+        FROM film f
+        ORDER BY f.titre ASC
+    ");
+
+    require "view/adminFilm.php";
+}
+public function addCasting() {
+    $pdo = Connect::seConnecter();
+
+    // Fetch actors
+    $requeteActeurs = $pdo->query("
+        SELECT a.id_acteur, CONCAT(p.prenom, ' ', p.nom) AS nom_complet
+        FROM acteur a
+        INNER JOIN personne p ON a.id_personne = p.id_personne
+        ORDER BY nom_complet ASC
+    ");
+    $acteurs = $requeteActeurs->fetchAll();
+
+    // Fetch films
+    $requeteFilms = $pdo->query("
+        SELECT id_film, titre
+        FROM film
+        ORDER BY titre ASC
+    ");
+    $films = $requeteFilms->fetchAll();
+
+    // Fetch roles
+    $requeteRoles = $pdo->query("
+        SELECT id_role, description
+        FROM role
+        ORDER BY description ASC
+    ");
+    $roles = $requeteRoles->fetchAll();
+
+    require "view/adminFilm.php";  // Adjust the view file path accordingly
+}
+
+
 
 }
+
+

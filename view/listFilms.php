@@ -116,6 +116,7 @@
     </form>
 </div>
 
+<button> <a href="index.php?action=adminFilm"> Admin </a> </button>
 
 <?php
 
