@@ -16,7 +16,6 @@
         <?php } ?>
     </tbody>
 </table>
-<br><br>
 
 <button> <a href="index.php?action=adminActeur"> Admin </a> </button>
 

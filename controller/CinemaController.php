@@ -369,9 +369,10 @@ Class CinemaController {
         require "view/listGenres.php";
     }
 
-    /* ----------------- ADMIN ----------------- */
+/* ---------------------------------- ADMIN ---------------------------------- */
 
-    /* ------ ADMIN GENRE ------ */
+
+/* ----------------------- ADMIN GENRE ----------------------- */
 
     public function adminGenre() {
 
@@ -389,10 +390,11 @@ Class CinemaController {
         require "view/adminGenre.php";
     }
 
-    /* --- ADMIN - ADD GENRE --- */
+/* -------------------- ADMIN - ADD GENRE -------------------- */
 
     public function addNouveauGenre() {
         $pdo = Connect::seConnecter();
+
         $libelle = filter_input(INPUT_POST, 'addGenre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
         if ($_POST["submit"]) {
@@ -411,16 +413,16 @@ Class CinemaController {
         }
     }
 
-    /* --- ADMIN - EDIT GENRE --- */
+/* -------------------- ADMIN - EDIT GENRE -------------------- */
     
-    public function editGenre() {
-        $pdo = Connect::seConnecter();
+    public function editGenre($id, $new_libelle) {
 
-        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
-        $new_libelle = filter_input(INPUT_POST, 'new_libelle', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $pdo = Connect::seConnecter();
+    
+        $id_genre = filter_var($id, FILTER_VALIDATE_INT);
+        $new_libelle = htmlspecialchars(trim($new_libelle), ENT_QUOTES, 'UTF-8');
     
         if ($id_genre && $new_libelle) {
-
             $requeteModification = $pdo->prepare("
 
                 UPDATE genre
@@ -428,382 +430,65 @@ Class CinemaController {
                 WHERE id_genre = :id_genre
 
             ");
-
+    
             $requeteModification->bindParam(':id_genre', $id_genre);
             $requeteModification->bindParam(':new_libelle', $new_libelle);
             $requeteModification->execute();
     
             header("Location: index.php?action=adminGenre");
+
+            exit;  // Assurez-vous de terminer le script après la redirection
+
+        } else {
+
+            echo "ID de genre ou libellé invalide.";
+
         }
 
-    require "view/adminGenre.php";
-
     }
+    
+/* -------------------- ADMIN - DELETE GENRE -------------------- */
 
-    /* --- ADMIN - DELETE GENRE --- */
-
-    public function deleteGenre() {
+    public function deleteGenre($id) {
         $pdo = Connect::seConnecter();
-
-        $id_genre = filter_input(INPUT_POST, 'id_genre', FILTER_VALIDATE_INT);
+    
+        $id_genre = filter_var($id, FILTER_VALIDATE_INT);
     
         if ($id_genre) {
-
             $requeteSuppression = $pdo->prepare("
-
                 DELETE FROM genre
                 WHERE id_genre = :id_genre
-
             ");
-
+    
             $requeteSuppression->bindParam(':id_genre', $id_genre);
             $requeteSuppression->execute();
     
             header("Location: index.php?action=adminGenre");
-        }
+            exit;
 
-        require "view/adminGenre.php";
+        } else {
+
+            echo "ID de genre invalide.";
+        }
     }
 
-    /* ------ ADMIN ACTEUR ------ */
+/* ----------------------- ADMIN ACTEUR ----------------------- */
 
     public function adminActeur() {
-        $pdo = Connect::seConnecter();
+
+        $pdo = connect::seConnecter();
         $requete = $pdo->query("
-            SELECT a.id_acteur, p.prenom, p.nom , p.id_personne
-            FROM acteur a
-            INNER JOIN personne p ON a.id_personne = p.id_personne
-            ORDER BY p.nom ASC
+
+        SELECT g.id_genre, libelle, COUNT(fg.id_film) as compte 
+        FROM genre g 
+        LEFT JOIN film_genres fg ON g.id_genre = fg.id_genre
+        GROUP BY g.id_genre
+        ORDER BY libelle
+
         ");
-        require "view/adminActeur.php";
+
+    require "view/adminGenre.php";
+    
     }
-
-    /* --- ADMIN - ADD ACTEUR --- */
-    
-    public function addNouveauActeur() {
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-            $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $sexe = filter_input(INPUT_POST, 'sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $dateNaissance = filter_input(INPUT_POST, 'dateNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $role = filter_input(INPUT_POST, 'role', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    
-            if ($nom && $prenom && $sexe && $dateNaissance && $role) {
-                $pdo = Connect::seConnecter();
-
-                $requeteAddPersonne = $pdo->prepare("
-
-                    INSERT INTO personne (nom, prenom, sexe, dateNaissance)
-                    VALUES (:nom, :prenom, :sexe, :dateNaissance)
-
-                ");
-
-                $requeteAddPersonne->bindParam(':nom', $nom);
-                $requeteAddPersonne->bindParam(':prenom', $prenom);
-                $requeteAddPersonne->bindParam(':sexe', $sexe);
-                $requeteAddPersonne->bindParam(':dateNaissance', $dateNaissance);
-                $requeteAddPersonne->execute();
-
-                $id_personne = $pdo->lastInsertId();
-
-                if ($role === 'acteur' || $role === 'les deux') {
-                    $requeteAddActeur = $pdo->prepare("
-                    
-                        INSERT INTO acteur (id_personne)
-                        VALUES (:id_personne)
-                    ");
-
-                    $requeteAddActeur->bindParam(':id_personne', $id_personne);
-                    $requeteAddActeur->execute();
-                }
-
-                if ($role === 'realisateur' || $role === 'les deux') {
-                    $requeteAddRealisateur = $pdo->prepare("
-
-                        INSERT INTO realisateur (id_personne)
-                        VALUES (:id_personne)
-
-                    ");
-
-                    $requeteAddRealisateur->bindParam(':id_personne', $id_personne);
-                    $requeteAddRealisateur->execute();
-                }
-
-                header("Location: index.php?action=adminActeur");
-
-                exit;
-
-            } else {
-
-                echo "Erreur : Veuillez vérifier les données saisies.";
-
-            }
-
-        }
-
-        require "view/adminActeur.php";
-    }
-    
-    /* --- ADMIN - DELETE ACTEUR --- */
-
-    public function deleteActeur($id) {
-        $pdo = Connect::seConnecter();
-    
-    if ($id) {
-
-        $requetePersonne = $pdo->prepare("
-
-        DELETE FROM personne
-        WHERE id_personne = :id_personne
-
-    ");
-
-        $requetePersonne->bindParam(':id_personne', $id);
-        $requetePersonne->execute();
-
-        header("Location: index.php?action=home");
-
-        exit;
-        }
-    
-        // Récupérer tous les acteurs pour les afficher dans la vue
-        
-        $requete = $pdo->prepare("
-            SELECT a.id_acteur, p.nom, p.prenom 
-            FROM acteur a
-            JOIN personne p ON a.id_personne = p.id_personne
-        ");
-        
-        $requete->execute();
-    
-        require "view/adminActeur.php";
-    }
-    
-    /* --- ADMIN - EDITE ACTEUR --- */
-    
-    public function editActeur($id) {
-
-        $pdo = Connect::seConnecter();
-        $id_acteur = filter_input(INPUT_POST, 'id_acteur', FILTER_VALIDATE_INT);
-        $new_nom = filter_input(INPUT_POST, 'new_nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $new_prenom = filter_input(INPUT_POST, 'new_prenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $new_sexe = filter_input(INPUT_POST, 'new_sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $new_dateNaissance = filter_input(INPUT_POST, 'new_dateNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $new_role = filter_input(INPUT_POST, 'new_role', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    
-    if ($id_acteur && $new_nom && $new_prenom && $new_sexe && $new_dateNaissance && $new_role) {
-        $requeteUpdatePersonne = $pdo->prepare("
-            UPDATE personne p
-            INNER JOIN acteur a ON p.id_personne = a.id_personne
-            SET p.nom = :new_nom, p.prenom = :new_prenom, p.sexe = :new_sexe, p.dateNaissance = :new_dateNaissance
-            WHERE a.id_acteur = :id_acteur
-        ");
-        $requeteUpdatePersonne->bindParam(':new_nom', $new_nom);
-        $requeteUpdatePersonne->bindParam(':new_prenom', $new_prenom);
-        $requeteUpdatePersonne->bindParam(':new_sexe', $new_sexe);
-        $requeteUpdatePersonne->bindParam(':new_dateNaissance', $new_dateNaissance);
-        $requeteUpdatePersonne->bindParam(':id_acteur', $id_acteur);
-        $requeteUpdatePersonne->execute();
-
-    if ($new_role === 'acteur' || $new_role === 'les deux') {
-        $requeteUpdateActeur = $pdo->prepare("
-            INSERT INTO acteur (id_personne)
-            SELECT p.id_personne
-            FROM personne p
-            WHERE p.id_personne = (
-                SELECT id_personne FROM acteur WHERE id_acteur = :id_acteur
-            )
-            ON DUPLICATE KEY UPDATE id_personne = VALUES(id_personne)
-        ");
-        $requeteUpdateActeur->bindParam(':id_acteur', $id_acteur);
-        $requeteUpdateActeur->execute();
-    } else {
-        $requeteDeleteActeur = $pdo->prepare("
-            DELETE FROM acteur
-            WHERE id_acteur = :id_acteur
-        ");
-        $requeteDeleteActeur->bindParam(':id_acteur', $id_acteur);
-        $requeteDeleteActeur->execute();
-    }
-
-    if ($new_role === 'realisateur' || $new_role === 'les deux') {
-        $requeteUpdateRealisateur = $pdo->prepare("
-            INSERT INTO realisateur (id_personne)
-            SELECT p.id_personne
-            FROM personne p
-            WHERE p.id_personne = (
-                SELECT id_personne FROM acteur WHERE id_acteur = :id_acteur
-            )
-            ON DUPLICATE KEY UPDATE id_personne = VALUES(id_personne)
-        ");
-        $requeteUpdateRealisateur->bindParam(':id_acteur', $id_acteur);
-        $requeteUpdateRealisateur->execute();
-    } else {
-        $requeteDeleteRealisateur = $pdo->prepare("
-            DELETE FROM realisateur
-            WHERE id_personne = (
-                SELECT id_personne FROM acteur WHERE id_acteur = :id_acteur
-            )
-        ");
-        $requeteDeleteRealisateur->bindParam(':id_acteur', $id_acteur);
-        $requeteDeleteRealisateur->execute();
-    }
-
-    header("Location: index.php?action=adminActeur");
-
-    exit;
-
-    }
-
-    require "view/adminActeur.php";
-    }
-
-        /* ------ ADMIN REALISATEUR------ */
-
-        public function adminRealisateur() {
-            $pdo = Connect::seConnecter();
-            $requete = $pdo->query("
-                SELECT id_realisateur, prenom, nom
-                FROM realisateur re, personne p
-                WHERE re.id_personne = p.id_personne
-                ORDER BY nom
-            ");
-            require "view/adminRealisateur.php";
-        }
-    
-        /* --- ADMIN - DELETE REALISATEUR --- */
-
-        public function deleteRealisateur() {
-            $pdo = Connect::seConnecter();
-            $id_realisateur = filter_input(INPUT_POST, 'id_realisateur', FILTER_VALIDATE_INT);
-        
-            if ($id_realisateur) {
-                // Step 1: Retrieve the id_personne associated with the id_realisateur
-                $requetePersonne = $pdo->prepare("
-                    SELECT id_personne 
-                    FROM realisateur 
-                    WHERE id_realisateur = :id_realisateur
-                ");
-                $requetePersonne->bindParam(':id_realisateur', $id_realisateur);
-                $requetePersonne->execute();
-                $id_personne = $requetePersonne->fetchColumn();
-        
-                if ($id_personne) {
-                    // Step 2: Delete the id_personne from the personne table
-                    $requeteSuppPersonne = $pdo->prepare("
-                        DELETE FROM personne
-                        WHERE id_personne = :id_personne
-                    ");
-                    $requeteSuppPersonne->bindParam(':id_personne', $id_personne);
-                    $requeteSuppPersonne->execute();
-                }
-        
-                // Step 3: Delete the id_realisateur from the realisateur table
-                $requeteSuppRealisateur = $pdo->prepare("
-                    DELETE FROM realisateur
-                    WHERE id_realisateur = :id_realisateur
-                ");
-                $requeteSuppRealisateur->bindParam(':id_realisateur', $id_realisateur);
-                $requeteSuppRealisateur->execute();
-        
-                header("Location: index.php?action=adminRealisateur");
-                exit;
-            }
-        
-            require "view/adminRealisateur.php";
-        }
-    
-        /* --- ADMIN - EDIT REALISATEUR --- */
-
-        public function editRealisateur() {
-            $pdo = Connect::seConnecter();
-            $id_realisateur = filter_input(INPUT_POST, 'id_realisateur', FILTER_VALIDATE_INT);
-            $new_nom = filter_input(INPUT_POST, 'new_nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $new_prenom = filter_input(INPUT_POST, 'new_prenom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $new_sexe = filter_input(INPUT_POST, 'new_sexe', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $new_dateNaissance = filter_input(INPUT_POST, 'new_dateNaissance', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $new_role = filter_input(INPUT_POST, 'new_role', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        
-            if ($id_realisateur && $new_nom && $new_prenom && $new_sexe && $new_dateNaissance && $new_role) {
-                // Update the personne information
-                $requeteUpdatePersonne = $pdo->prepare("
-                    UPDATE personne p
-                    INNER JOIN realisateur r ON p.id_personne = r.id_personne
-                    SET p.nom = :new_nom, p.prenom = :new_prenom, p.sexe = :new_sexe, p.dateNaissance = :new_dateNaissance
-                    WHERE r.id_realisateur = :id_realisateur
-                ");
-                $requeteUpdatePersonne->bindParam(':new_nom', $new_nom);
-                $requeteUpdatePersonne->bindParam(':new_prenom', $new_prenom);
-                $requeteUpdatePersonne->bindParam(':new_sexe', $new_sexe);
-                $requeteUpdatePersonne->bindParam(':new_dateNaissance', $new_dateNaissance);
-                $requeteUpdatePersonne->bindParam(':id_realisateur', $id_realisateur);
-                $requeteUpdatePersonne->execute();
-        
-                // Update role in acteur and realisateur tables as per the new_role
-                $requetePersonneId = $pdo->prepare("
-                    SELECT id_personne FROM realisateur WHERE id_realisateur = :id_realisateur
-                ");
-                $requetePersonneId->bindParam(':id_realisateur', $id_realisateur);
-                $requetePersonneId->execute();
-                $id_personne = $requetePersonneId->fetchColumn();
-        
-                if ($new_role === 'acteur' || $new_role === 'les deux') {
-                    $requeteUpdateActeur = $pdo->prepare("
-                        INSERT INTO acteur (id_personne)
-                        VALUES (:id_personne)
-                        ON DUPLICATE KEY UPDATE id_personne = VALUES(id_personne)
-                    ");
-                    $requeteUpdateActeur->bindParam(':id_personne', $id_personne);
-                    $requeteUpdateActeur->execute();
-                } else {
-                    $requeteDeleteActeur = $pdo->prepare("
-                        DELETE FROM acteur
-                        WHERE id_personne = :id_personne
-                    ");
-                    $requeteDeleteActeur->bindParam(':id_personne', $id_personne);
-                    $requeteDeleteActeur->execute();
-                }
-        
-                if ($new_role === 'realisateur' || $new_role === 'les deux') {
-                    $requeteUpdateRealisateur = $pdo->prepare("
-                        INSERT INTO realisateur (id_personne)
-                        VALUES (:id_personne)
-                        ON DUPLICATE KEY UPDATE id_personne = VALUES(id_personne)
-                    ");
-                    $requeteUpdateRealisateur->bindParam(':id_personne', $id_personne);
-                    $requeteUpdateRealisateur->execute();
-                } else {
-                    $requeteDeleteRealisateur = $pdo->prepare("
-                        DELETE FROM realisateur
-                        WHERE id_personne = :id_personne
-                    ");
-                    $requeteDeleteRealisateur->bindParam(':id_personne', $id_personne);
-                    $requeteDeleteRealisateur->execute();
-                }
-        
-                header("Location: index.php?action=adminRealisateur");
-                exit;
-            }
-        
-            require "view/adminRealisateur.php";
-        }
-
-    /* ------ ADMIN FILM ------ */
-
-    public function adminFilm() {
-        $pdo = Connect::seConnecter();
-        $requete = $pdo->query("
-            SELECT a.id_acteur, p.prenom, p.nom
-            FROM acteur a
-            INNER JOIN personne p ON a.id_personne = p.id_personne
-            ORDER BY p.nom ASC
-        ");
-        require "view/adminFilm.php";
-    }
-    
-
-
 
 }

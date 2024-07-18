@@ -1,47 +1,48 @@
 <?php ob_start(); ?>
 
 <!-- Formulaire d'ajout d'un genre -->
-
 <table>
-    <thead>
-        <tr>
-            <th>Les genres</th>
-        </tr>
-    </thead>
-    <br>
     <tbody>
+        <!-- Formulaire pour ajouter un nouveau genre -->
+        <form action="index.php?action=addNouveauGenre" method="post">
+            <label for="nomGenre">Ajout d'un genre : </label><br>
+            <input required="required" type="text" id="addGenre" name="addGenre" /><br>
+            <input type='submit' name='submit'> 
+        </form>
+
         <?php
-        // Récupérer et afficher tous les genres
+        // Boucle à travers les résultats de la requête et affiche chaque genre
         foreach ($requete->fetchAll() as $genre) {
         ?>
-            <tr>
-                <td><?= $genre["libelle"] ?></td> <!-- récupérer et afficher le libellé du genre -->
-                <td>
-                    <form action="index.php?action=deleteGenre" method="post" style="display:inline;">
-                        <input type="hidden" name="id_genre" value="<?= $genre['id_genre'] ?>">
-                        <input type="submit" value="Supprimer">
-                    </form>
-                    <form action="index.php?action=editGenre" method="post" style="display:inline;">
-                        <input type="hidden" name="id_genre" value="<?= $genre['id_genre'] ?>">
-                        <input type="text" name="new_libelle" required="required" placeholder="Nouveau nom">
-                        <input type="submit" value="Modifier">
-                    </form>
-                </td>
-            </tr>
+
+        <tr>
+            <!-- Affiche le nom du genre -->
+            <td><?= $genre["libelle"] ?></td>
+
+            <td>
+                <!-- Formulaire pour modifier le genre -->
+                <form action="index.php?action=editGenre&id=<?= $genre['id_genre'] ?>" method="post" style="display:inline;">
+                    <input type="text" name="new_libelle" required="required" placeholder="Nouveau nom">
+                    <input type="submit" value="Modifier">
+                </form>
+
+                <!-- Lien pour supprimer le genre avec une confirmation -->
+                <a href="index.php?action=deleteGenre&id=<?= $genre['id_genre'] ?>" 
+                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce genre de film ?');"> Supprimer</a>
+            </td>
+        </tr>
         <?php } ?>
     </tbody>
 </table>
 
 <br>
 
-<form action="index.php?action=addNouveauGenre" method="post">
-    <!-- édition du libellé du genre -->
-    <label for="nomGenre">Nom du genre :</label><br>
-    <input required="required" type="text" id="addGenre" name="addGenre" /><br>
-    <input type='submit' name='submit'> <button><a href="index.php?action=listGenres"> retour </a></button>
-</form>
+<!-- Bouton pour retourner à la liste des genres -->
+<button><a href="index.php?action=listGenres"> retour </a></button>
 
 <?php
+// Définition du titre de la page et du contenu, et inclusion du template
 $titre = "Administration Genre";
 $contenu = ob_get_clean();
 require "template.php";
+?>
