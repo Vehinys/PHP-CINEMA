@@ -41,8 +41,9 @@ if (isset($_GET["action"])) {
         case "editGenre"         : $ctrlCinema->editGenre($id, $new_libelle); break;
         case "deleteGenre"       : $ctrlCinema->deleteGenre($id); break;
 
-        case "addCasting"        : $ctrlCinema->addCasting($id); break;
-
+        case "addCasting"        : $ctrlCinema->addCasting(); break;
+        case "ajouterNouveauRole": $ctrlCinema->ajouterNouveauRole(); break;
+        
         default                  : $ctrlCinema->Home();
     }
 }
