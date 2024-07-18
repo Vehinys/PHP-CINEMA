@@ -474,29 +474,158 @@ public function deleteGenre($id) {
 
     } else {
 
-        echo "ID de genre invalide.";
-        
+        echo "ID de genre est invalide.";
+
     }
 }
 
 
 /* ----------------------- ADMIN ACTEUR ----------------------- */
 
-    public function adminActeur() {
+ // Méthode pour afficher la vue d'administration des acteurs
+ public function adminActeur() {
+    $pdo = Connect::seConnecter();
+    $requete = $pdo->query("
+        SELECT a.id_acteur, p.prenom, p.nom
+        FROM acteur a
+        INNER JOIN personne p ON a.id_personne = p.id_personne
+        ORDER BY p.nom ASC
+    ");
+    require "view/adminActeur.php";
+}
 
-        $pdo = connect::seConnecter();
-        $requete = $pdo->query("
+// Méthode pour ajouter un nouvel acteur
+public function addNouveauActeur() {
+    $pdo = Connect::seConnecter();
 
-        SELECT g.id_genre, libelle, COUNT(fg.id_film) as compte 
-        FROM genre g 
-        LEFT JOIN film_genres fg ON g.id_genre = fg.id_genre
-        GROUP BY g.id_genre
-        ORDER BY libelle
+    if (isset($_POST["submit"])) {
+        // Récupération des données du formulaire
+        $nom = $_POST['nom'];
+        $prenom = $_POST['prenom'];
+        $sexe = $_POST['sexe'];
+        $jour = $_POST['jour'];
+        $mois = $_POST['mois'];
+        $annee = $_POST['annee'];
+        
+        // Formatage de la date de naissance
+        $dateNaissance = "$annee-$mois-$jour";
 
+        // Début de la transaction
+        $pdo->beginTransaction();
+
+        // 1. Insérer dans la table personne
+        $requeteAjoutPersonne = $pdo->prepare("
+            INSERT INTO personne (nom, prenom, sexe, dateNaissance)
+            VALUES (:nom, :prenom, :sexe, :dateNaissance)
         ");
+        $requeteAjoutPersonne->bindParam(':nom', $nom);
+        $requeteAjoutPersonne->bindParam(':prenom', $prenom);
+        $requeteAjoutPersonne->bindParam(':sexe', $sexe);
+        $requeteAjoutPersonne->bindParam(':dateNaissance', $dateNaissance);
+        $requeteAjoutPersonne->execute();
+        
+        // Récupérer l'id_personne généré
+        $id_personne = $pdo->lastInsertId();
 
-    require "view/adminGenre.php";
+        // 2. Insérer dans la table acteur
+        $requeteAjoutActeur = $pdo->prepare("
+            INSERT INTO acteur (id_personne)
+            VALUES (:id_personne)
+        ");
+        $requeteAjoutActeur->bindParam(':id_personne', $id_personne);
+        $requeteAjoutActeur->execute();
 
+        // Validation de la transaction
+        $pdo->commit();
+
+        // Redirection vers la page d'administration des acteurs
+        header("Location: index.php?action=adminActeur");
+        exit;
     }
+}
+
+
+// Méthode pour supprimer un acteur
+
+public function deleteActeur($id) {
+    $pdo = Connect::seConnecter();
+    $id_acteur = filter_var($id, FILTER_VALIDATE_INT);
+
+    if ($id_acteur) {
+        $requeteSuppression = $pdo->prepare("
+            DELETE FROM acteur
+            WHERE id_acteur = :id_acteur
+        ");
+        $requeteSuppression->bindParam(':id_acteur', $id_acteur);
+        $requeteSuppression->execute();
+
+        header("Location: index.php?action=adminActeur");
+        exit;
+    } else {
+        echo "ID d'acteur invalide.";
+    }
+}
+
+// Méthode pour modifier un acteur
+public function editActeur($id) {
+    $pdo = Connect::seConnecter();
+    $id_acteur = filter_var($id, FILTER_VALIDATE_INT);
+
+    if ($id_acteur) {
+        // Récupération des nouvelles données depuis le formulaire
+        $new_nom = $_POST['new_nom'];
+        $new_prenom = $_POST['new_prenom'];
+        $new_sexe = $_POST['new_sexe'];
+        $new_dateNaissance = $_POST['new_dateNaissance'];
+
+        // Préparation de la requête de mise à jour
+        $requeteModification = $pdo->prepare("
+            UPDATE personne
+            SET nom = :nom, prenom = :prenom, sexe = :sexe, date_naissance = :date_naissance
+            WHERE id_personne = :id_personne
+        ");
+        $requeteModification->bindParam(':nom', $new_nom);
+        $requeteModification->bindParam(':prenom', $new_prenom);
+        $requeteModification->bindParam(':sexe', $new_sexe);
+        $requeteModification->bindParam(':date_naissance', $new_dateNaissance);
+        $requeteModification->bindParam(':id_personne', $id_acteur);
+        $requeteModification->execute();
+
+        header("Location: index.php?action=adminActeur");
+        exit;
+    } else {
+        echo "ID d'acteur invalide.";
+    }
+}
+
+public function deletePersonne($id) {
+    $pdo = Connect::seConnecter();
+    $id_personne = filter_var($id, FILTER_VALIDATE_INT);
+
+    if ($id_personne) {
+        // Suppression dans la table personne
+        $requeteSuppressionPersonne = $pdo->prepare("
+            DELETE FROM personne
+            WHERE id_personne = :id_personne
+        ");
+        $requeteSuppressionPersonne->bindParam(':id_personne', $id_personne);
+        $requeteSuppressionPersonne->execute();
+
+        // Suppression dans la table acteur (si la personne était aussi un acteur)
+        $requeteSuppressionActeur = $pdo->prepare("
+            DELETE FROM acteur
+            WHERE id_personne = :id_personne
+        ");
+        $requeteSuppressionActeur->bindParam(':id_personne', $id_personne);
+        $requeteSuppressionActeur->execute();
+
+        header("Location: index.php?action=adminActeur");
+        exit;
+    } else {
+        echo "ID de personne invalide.";
+    }
+}
+
+
 
 }

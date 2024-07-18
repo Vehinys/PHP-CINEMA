@@ -6,9 +6,11 @@
         <!-- Formulaire pour ajouter un nouveau genre -->
         <form action="index.php?action=addNouveauGenre" method="post">
             <label for="nomGenre">Ajout d'un genre : </label><br>
-            <input required="required" type="text" id="addGenre" name="addGenre" /><br>
+            <input required="required" type="text" id="addGenre" name="addGenre" /> <br><br>
             <input type='submit' name='submit'> 
         </form>
+        
+        <br><br>
 
         <?php
         // Boucle à travers les résultats de la requête et affiche chaque genre
@@ -16,6 +18,7 @@
         ?>
 
         <tr>
+        
             <!-- Affiche le nom du genre -->
             <td><?= $genre["libelle"] ?></td>
 
@@ -27,8 +30,10 @@
                 </form>
 
                 <!-- Lien pour supprimer le genre avec une confirmation -->
-                <a href="index.php?action=deleteGenre&id=<?= $genre['id_genre'] ?>" 
-                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce genre de film ?');"> Supprimer</a>
+
+                <button type="submit"><a href="index.php?action=deleteGenre&id=<?= $genre['id_genre'] ?>" 
+                onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce genre de film ?');"> Supprimer</a></button>
+                
             </td>
         </tr>
         <?php } ?>
