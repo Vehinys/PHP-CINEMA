@@ -2,16 +2,6 @@
 
 <table>
 
-    <!-- <thead>
-
-        <tr>
-
-            <th>details de l'acteur</th>
-
-        </tr>
-
-    </thead>  -->
-
     <tbody>
     <?php foreach ($requete->fetchAll() as $detailActeur) { ?>
 

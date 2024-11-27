@@ -684,136 +684,143 @@ public function addRealisateur() {
 
 // Méthode pour supprimer un acteur
 
-public function deleteRealisateur($id) {
-    $pdo = Connect::seConnecter();
-    $id_realisateur = filter_var($id, FILTER_VALIDATE_INT);
+    public function deleteRealisateur($id) {
+        $pdo = Connect::seConnecter();
+        $id_realisateur = filter_var($_GET['id'], FILTER_VALIDATE_INT);
 
-    if ($id_realisateur) {
-        $requeteSuppression = $pdo->prepare("
-            DELETE FROM realisateur
-            WHERE id_realisateur = :id_realisateur
-        ");
-        $requeteSuppression->bindParam(':id_realisateur', $id_realisateur);
-        $requeteSuppression->execute();
+        if ($id_realisateur) {
+            $requeteSuppression = $pdo->prepare("
+                DELETE FROM realisateur
+                WHERE id_realisateur = :id_realisateur
+            ");
+            $requeteSuppression->bindParam(':id_realisateur', $id_realisateur);
+            $requeteSuppression->execute();
 
-        header("Location: index.php?action=adminRealisateur");
-        exit;
-    } else {
-        echo "ID d'acteur invalide.";
+            header("Location: index.php?action=adminRealisateur");
+            exit;
+        } else {
+            echo "ID d'acteur invalide.";
+        }
     }
-}
 
 // Méthode pour modifier un acteur
 
-public function editRealisateur($id) {
-    $pdo = Connect::seConnecter();
+    public function editRealisateur($id) {
+        $pdo = Connect::seConnecter();
 
-    // Récupération et validation de l'ID de l'acteur
-    $id_realisateur = filter_input(INPUT_POST, 'id_realisateur', FILTER_VALIDATE_INT);
-    
-    // Vérification de la validité de l'ID
-    if (!$id_realisateur) {
-        echo "ID d'acteur invalide.";
-        return;
+        // Récupération et validation de l'ID de l'acteur
+        $id_realisateur = filter_input(INPUT_POST, 'id_realisateur', FILTER_VALIDATE_INT);
+        
+        // Vérification de la validité de l'ID
+        if (!$id_realisateur) {
+            echo "ID d'acteur invalide.";
+            return;
+        }
+        
+        // Récupération des nouvelles données depuis le formulaire
+        $new_nom = filter_input(INPUT_POST, 'new_nom', FILTER_SANITIZE_SPECIAL_CHARS);
+        $new_prenom = filter_input(INPUT_POST, 'new_prenom', FILTER_SANITIZE_SPECIAL_CHARS);
+        $new_sexe = filter_input(INPUT_POST, 'new_sexe', FILTER_SANITIZE_SPECIAL_CHARS);
+        $new_dateNaissance = $_POST['new_dateNaissance']; // Ajustez ce traitement selon vos besoins de validation
+
+        // Préparation de la requête de mise à jour
+        $requeteModification = $pdo->prepare("
+
+            UPDATE personne p
+            JOIN realisateur r ON r.id_personne = p.id_personne
+            SET nom = :new_nom , prenom = :new_prenom, sexe = :new_sexe, dateNaissance = :new_dateNaissance
+            WHERE id_realisateur = :id_realisateur
+
+        ");
+
+        // Liaison des paramètres et exécution de la requête
+        $requeteModification->bindParam(':new_nom', $new_nom);
+        $requeteModification->bindParam(':new_prenom', $new_prenom);
+        $requeteModification->bindParam(':new_sexe', $new_sexe);
+        $requeteModification->bindParam(':new_dateNaissance', $new_dateNaissance);
+        $requeteModification->bindParam(':id_realisateur', $id_realisateur);
+        $requeteModification->execute();
+
+        // Redirection après la modification
+        header("Location: index.php?action=adminRealisateur");
+        exit;
     }
-    
-    // Récupération des nouvelles données depuis le formulaire
-    $new_nom = filter_input(INPUT_POST, 'new_nom', FILTER_SANITIZE_SPECIAL_CHARS);
-    $new_prenom = filter_input(INPUT_POST, 'new_prenom', FILTER_SANITIZE_SPECIAL_CHARS);
-    $new_sexe = filter_input(INPUT_POST, 'new_sexe', FILTER_SANITIZE_SPECIAL_CHARS);
-    $new_dateNaissance = $_POST['new_dateNaissance']; // Ajustez ce traitement selon vos besoins de validation
-
-    // Préparation de la requête de mise à jour
-    $requeteModification = $pdo->prepare("
-
-        UPDATE personne p
-        JOIN realisateur r ON r.id_personne = p.id_personne
-        SET nom = :new_nom , prenom = :new_prenom, sexe = :new_sexe, dateNaissance = :new_dateNaissance
-        WHERE id_realisateur = :id_realisateur
-
-    ");
-
-    // Liaison des paramètres et exécution de la requête
-    $requeteModification->bindParam(':new_nom', $new_nom);
-    $requeteModification->bindParam(':new_prenom', $new_prenom);
-    $requeteModification->bindParam(':new_sexe', $new_sexe);
-    $requeteModification->bindParam(':new_dateNaissance', $new_dateNaissance);
-    $requeteModification->bindParam(':id_realisateur', $id_realisateur);
-    $requeteModification->execute();
-
-    // Redirection après la modification
-    header("Location: index.php?action=adminRealisateur");
-    exit;
-}
 /* ----------------------- ADMIN ADMIN ----------------------- */
 
-public function adminFilm() {
-    $pdo = Connect::seConnecter();
-    
-    $films = $pdo->query("
-        SELECT titre, id_film
-        FROM film
+    public function adminFilm() {
+        $pdo = Connect::seConnecter();
+        
+        $films = $pdo->query("
+            SELECT titre, id_film
+            FROM film
+            ");
+        // récupère la liste des films pour le premier menu déroulant
+
+        $acteurs = $pdo->query("
+            SELECT a.id_personne, a.id_acteur, CONCAT(nom, ' ', prenom) as 'acteur'
+            FROM personne p, acteur a
+            WHERE p.id_personne = a.id_personne
+            ORDER BY nom
         ");
-    // récupère la liste des films pour le premier menu déroulant
+        // récupère la liste des acteurs pour le second menu déroulant
 
-    $acteurs = $pdo->query("
-        SELECT a.id_personne, a.id_acteur, CONCAT(nom, ' ', prenom) as 'acteur'
-        FROM personne p, acteur a
-        WHERE p.id_personne = a.id_personne
-        ORDER BY nom
-    ");
-    // récupère la liste des acteurs pour le second menu déroulant
+        $roles = $pdo->query("
+            SELECT id_role, nomRole
+            FROM role
+            ORDER BY nomRole
+        ");
+        // récupère la liste de tous les rôles présents en BDD pour le troisième menu déroulant
 
-    $roles = $pdo->query("
-        SELECT id_role, nomRole
-        FROM role
-        ORDER BY nomRole
-    ");
-    // récupère la liste de tous les rôles présents en BDD pour le troisième menu déroulant
-
-require "view\adminFilm.php";
-}
-
-public function addCasting() {
-
-    $film = filter_input(INPUT_POST, 'film'); // récupère le film choisi par l'utilisateur sur la page de modification de casting
-    $acteur = filter_input(INPUT_POST, 'acteur'); // récupère l'acteur choisi par l'utilisateur à associer au film et au rôle
-    $role = filter_input(INPUT_POST, 'role'); // récupère le rôle choisi par l'utilisateur à associer au film et à l'acteur
-
-    if($_POST["submit"]) {
-
-        $pdo = Connect::seConnecter(); 
-
-        $requeteAjoutCasting = $pdo->query("
-            INSERT INTO casting (id_film, id_acteur, id_role)
-            VALUES ('$film', '$acteur', '$role')
-        "); // requête qui ajoute l'association des trois valeurs à la table casting
+    require "view\adminFilm.php";
     }
-}
 
-// fonction pour afficher le formulaire d'ajout de rôle à la BDD
-public function afficherFormulaireRole() {
-    require 'view\adminFilm.php';
-}
+    public function addCasting() {
 
-// fonction qui permet d'ajouter le rôle que l'on souhaite créer à la BDD 
-public function ajouterNouveauRole() {
+        $film = filter_input(INPUT_POST, 'film'); // récupère le film choisi par l'utilisateur sur la page de modification de casting
+        $acteur = filter_input(INPUT_POST, 'acteur'); // récupère l'acteur choisi par l'utilisateur à associer au film et au rôle
+        $role = filter_input(INPUT_POST, 'role'); // récupère le rôle choisi par l'utilisateur à associer au film et à l'acteur
 
-    $pdo = Connect::seConnecter();
+        if($_POST["submit"]) {
 
-    $role = filter_input(INPUT_POST, 'nomRole', FILTER_SANITIZE_FULL_SPECIAL_CHARS); // récupère et filtre la valeur saisie par l'utilisateur
+            $pdo = Connect::seConnecter(); 
 
-    if ($_POST['submit']) { 
+            $requeteAjoutCasting = $pdo->query("
 
-        $requeteAjoutRole = $pdo->query("
-            INSERT INTO role (nomRole)
-            VALUES ('$role')
-        "); // requete qui ajoute le nouveau rôle à la BDD
+                INSERT INTO casting (id_film, id_acteur, id_role)
+                VALUES ('$film', '$acteur', '$role')
+                
+            "); // requête qui ajoute l'association des trois valeurs à la table casting
+        }
     }
-    header("Location: index.php?action=adminFilm");
-    exit;
-}
 
+    // fonction pour afficher le formulaire d'ajout de rôle à la BDD
+    public function afficherFormulaireRole() {
+
+        require 'view\adminFilm.php';
+    }
+
+    // fonction qui permet d'ajouter le rôle que l'on souhaite créer à la BDD 
+
+    public function ajouterNouveauRole() {
+
+        $pdo = Connect::seConnecter();
+
+        $role = filter_input(INPUT_POST, 'nomRole', FILTER_SANITIZE_FULL_SPECIAL_CHARS); // récupère et filtre la valeur saisie par l'utilisateur
+
+        if ($_POST['submit']) { 
+
+            $requeteAjoutRole = $pdo->query("
+
+                INSERT INTO role (nomRole)
+                VALUES ('$role')
+
+            "); // requete qui ajoute le nouveau rôle à la BDD
+        }
+
+        header("Location: index.php?action=adminFilm");
+        exit;
+
+    }
 }
 
 
